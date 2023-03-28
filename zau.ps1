@@ -12,7 +12,7 @@ $version = (Get-Content package.json) -join "`n" | ConvertFrom-Json | Select -Ex
 # Variables of the names and paths
 $archiveName = "$name-$version.zip"         # name of the zip file
 $zipPath = "./Builds/$archiveName"          # path to the zip file
-$source = "./dist/*"                        # files which should be zipped (everything in dist folder) TODO: Change afterwards to dist folder!
+$source = "./dist/*"                        # files which should be zipped (everything in dist folder)
 $itchPath = "stiggstogg/$name" + ":html5"   # path of the itch.io project to which the file should be uploaded
 
 # Overview
