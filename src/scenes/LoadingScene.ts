@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
-import spongeImg from '../assets/images/sponge.jpeg';
+import shipImg from '../assets/images/ship.png';
+import bgImg from '../assets/images/background.png';
 
 // "Loading" scene: Loads all assets and shows a progress bar while loading
 export default class LoadingScene extends Phaser.Scene {
@@ -63,7 +64,8 @@ export default class LoadingScene extends Phaser.Scene {
         }, this);
 
         // load images
-        this.load.image('sponge', spongeImg);
+        this.load.image('background', bgImg);
+        this.load.image('ship', shipImg);
 
         // load audio
         //this.load.audio('miss', 'assets/audio/Pew.mp3');
@@ -72,7 +74,7 @@ export default class LoadingScene extends Phaser.Scene {
 
     // Add the animations and change to "Home" scene, directly after loading
     create() {
-        this.scene.start('Home');
+        this.scene.start('Game');   // TODO: Change to menu scene as soon as it is ready
     }
 
 }

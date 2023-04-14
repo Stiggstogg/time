@@ -157,14 +157,14 @@ export default class HomeScene extends Phaser.Scene {
     addKeys(): void {
 
         // up and down keys (moving the selection of the entries)
-        this.input.keyboard.addKey('Down').on('down', function(this: HomeScene) { this.selectNext() }, this);
-        this.input.keyboard.addKey('S').on('down', function(this: HomeScene) { this.selectNext() }, this);
-        this.input.keyboard.addKey('Up').on('down', function(this: HomeScene) { this.selectPrevious() }, this);
-        this.input.keyboard.addKey('W').on('down', function(this: HomeScene) { this.selectPrevious() }, this);
+        //this.input.keyboard.addKey('Down').on('down', function(this: HomeScene) { this.selectNext() }, this);
+        //this.input.keyboard.addKey('S').on('down', function(this: HomeScene) { this.selectNext() }, this);
+        //this.input.keyboard.addKey('Up').on('down', function(this: HomeScene) { this.selectPrevious() }, this);
+        //this.input.keyboard.addKey('W').on('down', function(this: HomeScene) { this.selectPrevious() }, this);
 
         // enter and space key (confirming a selection)
-        this.input.keyboard.addKey('Enter').on('down', function(this: HomeScene) { this.spaceEnterKey() }, this);
-        this.input.keyboard.addKey('Space').on('down', function(this: HomeScene) { this.spaceEnterKey() }, this);
+        //this.input.keyboard.addKey('Enter').on('down', function(this: HomeScene) { this.spaceEnterKey() }, this);
+        //this.input.keyboard.addKey('Space').on('down', function(this: HomeScene) { this.spaceEnterKey() }, this);
 
     }
 
