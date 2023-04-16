@@ -34,6 +34,13 @@ export default class GameScene extends Phaser.Scene {
     // Creates all objects of this scene
     create(): void {
 
+        const a = document.createElement('a');
+        const file = new Blob(["test"], {type: 'text/plain'});
+        a.href = URL.createObjectURL(file);
+        a.download = 'juhuu.txt';
+        a.click();
+
+
         // create the world
         this.createWorld();
 

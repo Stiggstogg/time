@@ -12,12 +12,12 @@ export interface LevelData {
     objectives: ObjectiveData[]
 }
 
-interface ShipData {
+export interface ShipData {
     x: number
     y: number
 }
 
-interface BlockData {
+export interface BlockData {
     x: number,
     y: number,
     width: number,
@@ -25,7 +25,16 @@ interface BlockData {
     angle: number
 }
 
-interface ObjectiveData {
+export interface ObjectiveData {
     x: number,
     y: number
+}
+
+// interface for all other keys (in the editore)
+export interface OtherKeys {
+    Z: Phaser.Input.Keyboard.Key,
+    ENTER: Phaser.Input.Keyboard.Key,
+    Q: Phaser.Input.Keyboard.Key,
+    W: Phaser.Input.Keyboard.Key,
+    D: Phaser.Input.Keyboard.Key
 }
