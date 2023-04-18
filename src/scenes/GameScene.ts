@@ -5,12 +5,14 @@ import Objective from '../sprites/Objective';
 import gameOptions from '../helper/gameOptions';
 import eventsCenter from '../helper/eventsCenter';
 import {GameData, LevelData} from '../helper/interfaces';
+import Indicator from "../sprites/Indicator";
 
 // "Game" scene: Scene for the main game
 export default class GameScene extends Phaser.Scene {
 
     private ship!: Ship;
     private objectives!: Objective[];
+    private indicators!: Indicator[];
     private gameData!: GameData;
 
     // Constructor
@@ -28,18 +30,12 @@ export default class GameScene extends Phaser.Scene {
 
         // initialize variables
         this.objectives = [];
+        this.indicators = [];
 
     }
 
     // Creates all objects of this scene
     create(): void {
-
-        const a = document.createElement('a');
-        const file = new Blob(["test"], {type: 'text/plain'});
-        a.href = URL.createObjectURL(file);
-        a.download = 'juhuu.txt';
-        a.click();
-
 
         // create the world
         this.createWorld();
@@ -61,7 +57,14 @@ export default class GameScene extends Phaser.Scene {
     // Update function for the game loop.
     update(_time: number, _delta: number): void {       // remove underscore if time and delta is needed
 
+        // update the ship
         this.ship.update();
+
+        // update the indicators
+        for (let i = 0; i < this.indicators.length; i++) {
+            this.indicators[i].update();
+        }
+
 
     }
 
@@ -89,8 +92,14 @@ export default class GameScene extends Phaser.Scene {
         // event when ship collides with objective
         eventsCenter.on('objectiveCollide', function(this: GameScene, objective: Objective) {
 
-            objective.destroy();                                                            // destroy the objective
-            this.objectives.splice(this.objectives.indexOf(objective), 1);          // remove it from the list of objectives
+            const index = this.objectives.indexOf(objective);               // get the index of the objective in the array
+
+            this.indicators[index].destroy();                               // destroy the indicator
+            this.indicators.splice(index, 1);                               // remove the indicator from the list of indicators
+
+            objective.destroy();                                            // destroy the objective
+            this.objectives.splice(index, 1);                     // remove it from the list of objectives
+
 
             if (this.objectives.length < 1) {
                 console.log('you won!');
@@ -141,8 +150,10 @@ export default class GameScene extends Phaser.Scene {
 
             this.add.existing(new Block(this,
                 gameOptions.worldWidth * levelData.blocks[i].x,
-                gameOptions.worldHeight * levelData.blocks[i].y
-            ));
+                gameOptions.worldHeight * levelData.blocks[i].y,
+                gameOptions.worldWidth * levelData.blocks[i].width,
+                gameOptions.worldHeight * levelData.blocks[i].height,
+                levelData.blocks[i].angle));
 
         }
 
@@ -152,7 +163,14 @@ export default class GameScene extends Phaser.Scene {
             this.objectives.push(this.add.existing(new Objective(this,
                 gameOptions.worldWidth * levelData.objectives[i].x,
                 gameOptions.worldHeight * levelData.objectives[i].y,
-                0xeec39a)));
+                levelData.objectives[i].color)));
+
+        }
+
+        // create indicators (one for each objective and in exactly the same order!)
+        for (let i = 0; i < this.objectives.length; i++) {
+
+            this.indicators.push(this.add.existing(new Indicator(this, this.ship, this.objectives[i])));
 
         }
 

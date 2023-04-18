@@ -17,6 +17,8 @@ Q + mouseclick:     Spawn block
 W + mouseclick:     Spawn objective
 D:                  Delete selected objective or block
 
+B:                  Download level file
+
  */
 
 export default class EditorScene extends Phaser.Scene {
@@ -65,9 +67,6 @@ export default class EditorScene extends Phaser.Scene {
         // Add controls
         this.addControls();
 
-        // select ship
-        this.selectedObject = this.ship;
-
         // select first block for the UI
         this.updateGUI(this.blocks[0]);
 
@@ -96,7 +95,7 @@ export default class EditorScene extends Phaser.Scene {
         });
 
         // add keyboard other keyboard controls
-        this.otherKeys = this.input.keyboard?.addKeys('Z,Q,W,ENTER,D') as OtherKeys;
+        this.otherKeys = this.input.keyboard?.addKeys('Z,Q,W,B,D') as OtherKeys;
 
         // dragging
         this.input.on('drag', function (_pointer: Phaser.Input.Pointer, sprite: Phaser.GameObjects.Sprite, dragX: number, dragY: number) {
@@ -138,8 +137,8 @@ export default class EditorScene extends Phaser.Scene {
 
         }, this);
 
-        // control for the ENTER key: Download JSON file
-        this.otherKeys.ENTER.on('down', function(this: EditorScene) {this.downloadJSON()}, this);
+        // control for the B key: Download JSON file
+        this.otherKeys.B.on('down', function(this: EditorScene) {this.downloadJSON()}, this);
 
         // control for the D key: Delete the selected object
         this.otherKeys.D.on('down', function(this: EditorScene) {this.destroySelected()}, this);
@@ -175,6 +174,9 @@ export default class EditorScene extends Phaser.Scene {
             'ship'
         );
 
+        // select ship
+        this.selectedObject = this.ship;
+
         this.ship.setInteractive({draggable: true});
 
         // place all blocks
@@ -183,7 +185,10 @@ export default class EditorScene extends Phaser.Scene {
             this.createNewBlock(
                 gameOptions.worldWidth * levelData.blocks[i].x,
                 gameOptions.worldHeight * levelData.blocks[i].y
-            );
+            ).setAngle(levelData.blocks[i].angle)
+                .setDisplaySize(
+                    gameOptions.worldWidth * levelData.blocks[i].width,
+                    gameOptions.worldHeight * levelData.blocks[i].height);
         }
 
         // place all objectives and add them to the objectives array
@@ -225,6 +230,7 @@ export default class EditorScene extends Phaser.Scene {
             levelDataObject.objectives.push({
                 x: this.objectives[i].x  / gameOptions.worldWidth,
                 y: this.objectives[i].y  / gameOptions.worldHeight,
+                color: 16776960                                        // yellow is the standard color
             });
         }
 
@@ -238,7 +244,7 @@ export default class EditorScene extends Phaser.Scene {
     }
 
     // create a new block
-    createNewBlock(x: number, y: number): void {
+    createNewBlock(x: number, y: number): Phaser.GameObjects.Sprite {
 
         const tempSprite = this.add.sprite(x, y, 'block');      // create block object
 
@@ -257,11 +263,14 @@ export default class EditorScene extends Phaser.Scene {
         });
 
         this.blocks.push(tempSprite);                                   // add it to the array of blocks
+        this.selectSprite(tempSprite);                                    // select this sprite
+
+        return tempSprite;
 
     }
 
     // create a new block
-    createNewObjective(x: number, y: number): void {
+    createNewObjective(x: number, y: number): Phaser.GameObjects.Sprite {
 
         const tempSprite = this.add.sprite(x, y, 'objective');      // create objective object
 
@@ -277,7 +286,9 @@ export default class EditorScene extends Phaser.Scene {
         });
 
         this.objectives.push(tempSprite);                                 // add it to the array of objectives
+        this.selectSprite(tempSprite);                                    // select this sprite
 
+        return tempSprite;
     }
 
     // add gui (for block manipulation
@@ -308,6 +319,21 @@ export default class EditorScene extends Phaser.Scene {
             this.selectedObject.destroy();
 
         }
+
+    }
+
+    // select object
+    selectSprite(sprite: Phaser.GameObjects.Sprite) {
+
+        this.selectedObject.clearTint();
+        this.selectedObject = sprite;
+        this.selectedObject.setTintFill(0xff0000);
+
+        if (sprite.texture.key == 'block') {
+            this.updateGUI(sprite);
+        }
+
+
 
     }
 

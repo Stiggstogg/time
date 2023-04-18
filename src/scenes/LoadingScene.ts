@@ -4,7 +4,12 @@ import shipImg from '../assets/images/ship.png';
 import blockImg from '../assets/images/block.png';
 import objectiveImg from '../assets/images/objective.png';
 import placeholderImg from '../assets/images/placeholder.png';
+import indicatorImg from '../assets/images/indicator.png';
+
+// Levels
+import level0Json from '../assets/json/level0.json';
 import level1Json from '../assets/json/level1.json';
+import level2Json from '../assets/json/level2.json';
 
 // "Loading" scene: Loads all assets and shows a progress bar while loading
 export default class LoadingScene extends Phaser.Scene {
@@ -73,18 +78,21 @@ export default class LoadingScene extends Phaser.Scene {
         this.load.image('block', blockImg);
         this.load.image('objective', objectiveImg);
         this.load.image('placeholder', placeholderImg);
+        this.load.image('indicator', indicatorImg);
 
         // load audio
         //this.load.audio('miss', 'assets/audio/Pew.mp3');
 
         // load json
+        this.load.json('level0', level0Json);
         this.load.json('level1', level1Json);
+        this.load.json('level2', level2Json);       // TODO: this is not the final level!
 
     }
 
     // Add the animations and change to "Home" scene, directly after loading
     create() {
-        this.scene.start('Editor', {
+        this.scene.start('Game', {
             level: 1
         });   // TODO: Change to menu scene as soon as it is ready
     }

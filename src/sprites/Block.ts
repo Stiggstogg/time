@@ -4,7 +4,7 @@ import Phaser from 'phaser';
 export default class Block extends Phaser.Physics.Matter.Image {
 
     // Constructor
-    constructor(scene: Phaser.Scene, x: number, y: number) {
+    constructor(scene: Phaser.Scene, x: number, y: number, width: number, height: number, angle: number) {
 
         super(scene.matter.world, x, y, 'block');
 
@@ -16,6 +16,9 @@ export default class Block extends Phaser.Physics.Matter.Image {
             isSensor: true                              // only works as a sensor
         });
 
+        // set display size and angle
+        this.setDisplaySize(width, height);
+        this.setAngle(angle);
 
         // set collision category and with whom it collides
         this.setCollisionCategory(2);   // category needs to be a power of 2, e.g. 1, 2, 4, 8,...!

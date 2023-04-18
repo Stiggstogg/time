@@ -27,13 +27,14 @@ export interface BlockData {
 
 export interface ObjectiveData {
     x: number,
-    y: number
+    y: number,
+    color: number
 }
 
 // interface for all other keys (in the editore)
 export interface OtherKeys {
     Z: Phaser.Input.Keyboard.Key,
-    ENTER: Phaser.Input.Keyboard.Key,
+    B: Phaser.Input.Keyboard.Key,
     Q: Phaser.Input.Keyboard.Key,
     W: Phaser.Input.Keyboard.Key,
     D: Phaser.Input.Keyboard.Key
