@@ -92,9 +92,7 @@ export default class LoadingScene extends Phaser.Scene {
 
     // Add the animations and change to "Home" scene, directly after loading
     create() {
-        this.scene.start('Game', {
-            level: 1
-        });   // TODO: Change to menu scene as soon as it is ready
+        this.scene.start('Home');
     }
 
 }

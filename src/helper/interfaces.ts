@@ -2,7 +2,12 @@
 
 // interface for the game data which is sent between scenes
 export interface GameData {
-    level: number
+    level: number,
+    points: number,
+    time?: number,
+    expectedPoints?: number,
+    damagePoints?: number,
+    successful?: boolean
 }
 
 // interface for the level json
@@ -31,7 +36,7 @@ export interface ObjectiveData {
     color: number
 }
 
-// interface for all other keys (in the editore)
+// interface for all other keys (in the editor)
 export interface OtherKeys {
     Z: Phaser.Input.Keyboard.Key,
     B: Phaser.Input.Keyboard.Key,

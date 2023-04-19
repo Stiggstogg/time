@@ -17,6 +17,8 @@ class GameOptions {
     private readonly shipTumblingRotationFactor: number;
     public readonly shipTumblingRotationSpeed: number;
     public readonly indicatorDistance: number;
+    public readonly textStyles: Phaser.Types.GameObjects.Text.TextStyle[];
+    public readonly numLevels: number;
 
 
     constructor() {
@@ -55,6 +57,33 @@ class GameOptions {
         // ---------------------
         this.indicatorDistance = 0.05               // distance of the indicator from the boundary (relative to game width)
 
+        // ---------------------
+        // Levels
+        // ---------------------
+        this.numLevels = 5;                         // number of levels
+
+
+        // ---------------------
+        // Text styles
+        // ---------------------
+
+        this.textStyles = [];
+
+        // Text style 0:
+        this.textStyles.push({
+            fontFamily: 'Arial',
+            fontSize: '70px',
+            color: '#FFFF00',
+            fontStyle: 'bold'
+        });
+
+        // Text style 1:
+        this.textStyles.push({
+            fontFamily: 'Arial',
+            fontSize: '40px',
+            color: '#ffff00',
+            fontStyle: ''
+        });
     }
 
 }

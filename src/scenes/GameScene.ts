@@ -102,8 +102,11 @@ export default class GameScene extends Phaser.Scene {
 
 
             if (this.objectives.length < 1) {
-                console.log('you won!');
-                this.scene.start('Game');
+
+                this.gameData.damagePoints = 99;                            // set damage points
+                this.gameData.successful = true;                            // set if it was successful or not
+
+                this.scene.start('Points', this.gameData);              // go to the points scene
             }
 
         }, this);
