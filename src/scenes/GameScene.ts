@@ -37,6 +37,9 @@ export default class GameScene extends Phaser.Scene {
     // Creates all objects of this scene
     create(): void {
 
+        // start UI scene
+        this.scene.launch('GameUI', {time: this.gameData.time});
+
         // create the world
         this.createWorld();
 

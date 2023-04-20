@@ -36,7 +36,6 @@ export default class OverviewScene extends Phaser.Scene {
     // Update function for the game loop.
     update(_time: number, _delta: number): void {       // remove underscore if time and delta is needed
 
-        console.log('Overview is running!');
 
     }
 

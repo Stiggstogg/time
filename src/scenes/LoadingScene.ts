@@ -5,6 +5,7 @@ import blockImg from '../assets/images/block.png';
 import objectiveImg from '../assets/images/objective.png';
 import placeholderImg from '../assets/images/placeholder.png';
 import indicatorImg from '../assets/images/indicator.png';
+import timechangerImg from '../assets/images/timechanger.png';
 
 // Levels
 import level0Json from '../assets/json/level0.json';
@@ -79,6 +80,7 @@ export default class LoadingScene extends Phaser.Scene {
         this.load.image('objective', objectiveImg);
         this.load.image('placeholder', placeholderImg);
         this.load.image('indicator', indicatorImg);
+        this.load.image('timechanger', timechangerImg);
 
         // load audio
         //this.load.audio('miss', 'assets/audio/Pew.mp3');
@@ -93,6 +95,7 @@ export default class LoadingScene extends Phaser.Scene {
     // Add the animations and change to "Home" scene, directly after loading
     create() {
         this.scene.start('Home');
+        //this.scene.start('Estimate', {level: 1, point: 0})
     }
 
 }

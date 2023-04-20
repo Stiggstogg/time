@@ -11,6 +11,7 @@ import HowtoScene from './scenes/HowtoScene';
 import EstimateScene from "./scenes/EstimateScene";
 import OverviewScene from "./scenes/OverviewScene";
 import GameScene from './scenes/GameScene';
+import GameUIScene from './scenes/GameUIScene';
 import PointsScene from './scenes/PointsScene';
 import EditorScene from "./scenes/EditorScene";
 
@@ -20,7 +21,12 @@ const config: Phaser.Types.Core.GameConfig = {
     type: Phaser.AUTO,
     width: gameOptions.gameWidth,
     height: gameOptions.gameHeight,
-    scene: [BootScene, LoadingScene, HomeScene, HowtoScene, EstimateScene, OverviewScene, GameScene, PointsScene, EditorScene],
+    scene: [BootScene, LoadingScene, HomeScene,
+        HowtoScene,
+        EstimateScene, OverviewScene,
+        GameScene, GameUIScene,
+        PointsScene,
+        EditorScene],
     title: 'TIME',                  // Shown in the console
     scale: {
         mode: Phaser.Scale.FIT,
