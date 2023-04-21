@@ -63,7 +63,7 @@ class GameOptions {
         // ---------------------
         // Levels
         // ---------------------
-        this.numLevels = 5;                         // number of levels
+        this.numLevels = 2;                         // number of levels
 
 
         // ---------------------

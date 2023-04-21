@@ -34,11 +34,11 @@ export default class PointsScene extends Phaser.Scene {
         // calculate points
         this.calculatePoints();
 
-        // Add texts
-        this.addTexts();
+        // Add congratulation message and corresponding buttons
+        this.addMessageAndButtons();
 
-        // Add buttons
-        this.addButtons();
+        // Add texts
+        this.addPointsTexts();
 
 
     }
@@ -63,7 +63,7 @@ export default class PointsScene extends Phaser.Scene {
 
 
     // add all texts
-    addTexts() {
+    addPointsTexts() {
 
         const startY = 0.4;         // y position where the points start
         const spaceY = 0.04;         // space between the different points
@@ -107,31 +107,71 @@ export default class PointsScene extends Phaser.Scene {
     }
 
 
-    // Add buttons including controls
-    addButtons() {
+    // Add congratulation message (or failed ;) and button to do the next action
+    // (next level or go back to menu when the last level was completed)
 
-        // button go to the next level or repeat the current one
-        const buttonNext = this.add.text(gameOptions.gameWidth / 2, gameOptions.gameHeight * 0.8,
-             'Continue', gameOptions.textStyles[1]);
-        buttonNext.setInteractive();
-        buttonNext.setOrigin(0.5, 0.5);                                                           // set position
-        buttonNext.on('pointerdown', function(this: PointsScene) { this.next() }, this);      // add touch control
+    addMessageAndButtons(): void {
 
-    }
+        const lastLevel = this.gameData.level == gameOptions.numLevels;
 
-    // Go to the next level or repeat the failed level
-    next() {
+        // Add empty button and then modify it later
+        const button = this.add.text(gameOptions.gameWidth / 2, gameOptions.gameHeight * 0.8,
+            ' ', gameOptions.textStyles[1]);
+        button.setInteractive();
+        button.setOrigin(0.5, 0.5);
 
-        this.gameData.points = this.newPoints;
+        // add an empty text and modify it later
+        const text = this.add.text(gameOptions.gameWidth / 2, gameOptions.gameHeight * 0.3,
+            ' ', gameOptions.textStyles[1]).setOrigin(0.5, 0.5);
 
-        if (this.gameData.successful) {            // level was completed successfully (go to the next level)
+        // Modify text and buttons based on if it was successful and the last level
+        if (lastLevel && this.gameData.successful) {                        // Level was successful and it was the last one
 
-            this.gameData.level += 1;
+            // button
+            button.setText('Done');
+            button.on('pointerdown', function(this: PointsScene) {
+
+                this.gameData.points = this.newPoints;
+                this.scene.start('Home');               // go back to menu
+
+            }, this);
+
+            // message
+            text.setText('All levels done!');
 
         }
+        else if (!lastLevel && this.gameData.successful) {                      // successful but there are still some levels
 
-        this.scene.start('Estimate', this.gameData);        // go to the estimation scene of the next or this level
+            // button
+            button.setText('Next Level');
+            button.on('pointerdown', function(this: PointsScene) {
 
+                this.gameData.level += 1;                                       // set the level to the next one
+
+                this.gameData.points = this.newPoints;
+                this.scene.start('Estimate', this.gameData);               // go back the estimation scene (next level)
+
+            }, this);
+
+            // message
+            text.setText('Mission accomplished');
+
+        }
+        else {                                                                      // not successful (repeat level)
+
+            // button
+            button.setText('Repeat Level');
+            button.on('pointerdown', function(this: PointsScene) {
+
+                this.gameData.points = this.newPoints;
+                this.scene.start('Estimate', this.gameData);               // go back the estimation scene (same level)
+
+            }, this);
+
+            // go back the estimation scene (next level)
+            text.setText('FAILED!');
+
+        }
     }
 
 }
