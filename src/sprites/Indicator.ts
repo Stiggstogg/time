@@ -27,6 +27,8 @@ export default class Indicator extends Phaser.GameObjects.Sprite {
         // set color (the same as the objective
         this.setTint(this.objective.tintTopLeft);           // this.objective.tint does not work, as it is only a setter
 
+        this.setDepth(3);
+
     }
 
     update() {

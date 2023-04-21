@@ -19,6 +19,9 @@ class GameOptions {
     public readonly indicatorDistance: number;
     public readonly textStyles: Phaser.Types.GameObjects.Text.TextStyle[];
     public readonly numLevels: number;
+    public readonly parTimePoints: number;
+    public readonly zeroPointTimeFactor: number;
+    public readonly collisionPenalty: number;
 
 
     constructor() {
@@ -84,6 +87,16 @@ class GameOptions {
             color: '#ffff00',
             fontStyle: ''
         });
+
+        // -----------------------------
+        // Parameters for point system
+        // -----------------------------
+
+        this.parTimePoints = 4723;          // the amount of points you will get when you exactly estimate the par time
+        this.zeroPointTimeFactor = 2;       // if multiplied with the par time, this is the time where you will get exactly 0 points
+        this.collisionPenalty = 100;            // the amount of points you loose when you crash
+
+
     }
 
 }

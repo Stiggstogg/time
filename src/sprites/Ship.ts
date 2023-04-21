@@ -116,10 +116,10 @@ export default class Ship extends Phaser.Physics.Matter.Sprite {
 
             if (data.bodyB.label == 'block') {                              // collision with a block
 
-                this.scene.cameras.main.shake(500, 0.01);
+                this.scene.cameras.main.shake(500, 0.01);    // shake camera
 
                 this.tumblingStartTime = Date.now();        // set the tumbling start time to now
-                this.isTumbling = true;     // set that the ship is tumbling (going back to a new position)
+                this.isTumbling = true;                     // set that the ship is tumbling (going back to a new position)
 
                 // stop all movement
                 this.setAngularVelocity(0);
@@ -129,6 +129,9 @@ export default class Ship extends Phaser.Physics.Matter.Sprite {
                 // place the ship back to the last safe position
                 this.x = this.sensor.safeX;
                 this.y = this.sensor.safeY;
+
+                eventsCenter.emit('blockCollide');      // emit event when the ship collides with a block so that the number of collisions can be counted
+
 
             }
             else if (data.bodyB.label == 'objective') {

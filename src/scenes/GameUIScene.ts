@@ -1,13 +1,18 @@
 import Phaser from 'phaser';
 import gameOptions from '../helper/gameOptions';
+import {GameData} from '../helper/interfaces';
+import eventsCenter from '../helper/eventsCenter';
 
 // "GameUI" scene: Scene which shows the current time
 export default class GameUIScene extends Phaser.Scene {
 
-    private estimatedTime!: number;                // time which was estimated
-    private timeText!: Phaser.GameObjects.Text;    // text object which shows the current time
-    private startTime!: number;                             // start time (in ms since Unix Epoch)
-    private running!: boolean;                              // is the timer running
+    private gameData!: GameData;
+    private timeText!: Phaser.GameObjects.Text;     // text object which shows the current time
+    private collisionsText!: Phaser.GameObjects.Text // text which shows the number of collisions
+    private startTime!: number;                     // start time (in ms since Unix Epoch)
+    private running!: boolean;                      // is the timer running
+    private remainingTime!: number;                 // remaining time
+    private collisionsCounter!: number;              // counts the number of collisions
 
     // Constructor
     constructor() {
@@ -17,23 +22,26 @@ export default class GameUIScene extends Phaser.Scene {
     }
 
     // Initialize parameters
-    init(data: { time: number }): void {
+    init(data: GameData): void {
 
         // get game data
-        this.estimatedTime = data.time;                     // get estimated time
+        this.gameData = data;
 
-        // set that the timer is not running yet
-        this.running = false;
+        // initialize variables
+        this.remainingTime = this.gameData.time!;       // set remaining time
+        this.running = false;                           // set that the timer is not running yet
+        this.collisionsCounter = 0;                    // set the collisions counter to 0
 
     }
 
     // Shows the all objects of this scene
     create(): void {
 
-        // Add text for the time
-        this.timeText = this.add.text(gameOptions.gameWidth * 0.2, gameOptions.gameWidth * 0.2, this.estimatedTime.toString(), gameOptions.textStyles[1]).setOrigin(1, 0.5);
+        // add texts
+        this.addTexts();
 
-        this.startTimer();
+        // setup all event handlers
+        this.eventsHandlingSetup();
 
     }
 
@@ -44,13 +52,41 @@ export default class GameUIScene extends Phaser.Scene {
         if (this.running) {
 
             const timeDifference = new Date().getTime() - this.startTime;       // calculate the time difference since the timer was started (in ms)
-            const remainingTime = this.estimatedTime - timeDifference / 1000;      // calculate the remaining time
+            this.remainingTime = this.gameData.time! - timeDifference / 1000;      // calculate the remaining time
 
-            this.timeText.setText(Math.round(remainingTime).toString() + ' s');
+            this.setTimerText(this.remainingTime);
 
         }
 
+        // check if time is up
+        if (this.remainingTime <= 0) {
 
+            this.timeUp();
+
+        }
+
+    }
+
+    // add all texts
+    addTexts() {
+
+        // Stats position
+        const statsY = 0.05;
+
+        // Add text for the time
+        this.timeText = this.add.text(gameOptions.gameWidth * 0.2, gameOptions.gameWidth * statsY,
+            ' ', gameOptions.textStyles[1]).setOrigin(1, 0.5);
+        this.setTimerText(this.remainingTime);
+        this.timeText.setDepth(0);
+
+        // Add text for level
+        const levelText = 'Level: ' + this.gameData.level.toString() + '/' + gameOptions.numLevels.toString();
+        this.add.text(gameOptions.gameWidth * 0.5, gameOptions.gameWidth * statsY,
+            levelText, gameOptions.textStyles[1]).setOrigin(0.5, 0.5);
+
+        // Add collision test
+        this.collisionsText = this.add.text(gameOptions.gameWidth * 0.8, gameOptions.gameWidth * statsY,
+            this.collisionsCounter.toString(), gameOptions.textStyles[1]).setOrigin(1, 0.5);
 
     }
 
@@ -61,8 +97,55 @@ export default class GameUIScene extends Phaser.Scene {
 
         this.startTime = new Date().getTime();      // get the time (in ms since Unix Epoch)
 
+    }
+
+    // Set timer text
+    setTimerText(time: number) {
+
+        const timeSuffix = ' s';
+
+        this.timeText.setText(Math.round(time).toString() + timeSuffix);
 
     }
 
+    // Action when time is up
+    timeUp() {
+
+        eventsCenter.emit('timeUp');
+
+    }
+
+    // setup all the events and make sure they are also cleaned up at the end
+    eventsHandlingSetup() {
+
+        // event to wait for the start of the game (when the user presses the first time the input)
+        eventsCenter.once('startgame', this.startTimer, this);
+
+        // event when the ship collides with blocks
+        eventsCenter.on('blockCollide', function (this: GameUIScene) {
+
+            this.increaseCollisions();
+
+        }, this);
+
+        // Cleanup the events when the scene is shut down
+        this.events.once(Phaser.Scenes.Events.SHUTDOWN, function () {
+            eventsCenter.off('startgame');
+            eventsCenter.off('blockCollide');
+        });
+
+    }
+
+    // increase collisions (counter and text)
+    increaseCollisions() {
+
+        // increase the collisions counter
+        this.collisionsCounter += 1;
+
+        // update the collisions text
+        this.collisionsText.setText(this.collisionsCounter.toString());
+
+
+    }
 
 }

@@ -6,12 +6,13 @@ export interface GameData {
     points: number,
     time?: number,
     expectedPoints?: number,
-    damagePoints?: number,
+    collisions?: number,
     successful?: boolean
 }
 
 // interface for the level json
 export interface LevelData {
+    partime: number,
     ship: ShipData,
     blocks: BlockData[],
     objectives: ObjectiveData[]

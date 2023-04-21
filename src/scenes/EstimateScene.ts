@@ -7,6 +7,7 @@ export default class EstimateScene extends Phaser.Scene {
 
     private gameData!: GameData;
     private numbers!: Phaser.GameObjects.Text[];
+    private expectedPoints!: Phaser.GameObjects.Text;
 
     // Constructor
     constructor() {
@@ -54,7 +55,7 @@ export default class EstimateScene extends Phaser.Scene {
     // Setup overview scene
     setupOverview() {
 
-        this.scene.launch('Overview');                          // launch the overview scene
+        this.scene.launch('Overview', this.gameData);                          // launch the overview scene
         this.scene.pause( 'Overview');                          // and pause it directly (it will be hidden automatically in its init() function
 
     }
@@ -82,6 +83,7 @@ export default class EstimateScene extends Phaser.Scene {
     // add the numbers
     addNumbers() {
 
+        // add the numbers to estimate the time
         const startTime = [1, 0 , 0];
 
         const distance = 0.2;               // horizontal distance between the numbers (relative to game width)
@@ -99,6 +101,11 @@ export default class EstimateScene extends Phaser.Scene {
         const lastNumber = this.numbers[this.numbers.length - 1];
         this.add.text(lastNumber.x + gameOptions.gameWidth * distance * 0.75, lastNumber.y,
             's', gameOptions.textStyles[1]).setOrigin(0.5, 0.5);
+
+        // add the expected points number
+        this.expectedPoints = this.add.text(gameOptions.gameWidth * 0.5,gameOptions.gameHeight * 0.7,
+            ' ', gameOptions.textStyles[1]).setOrigin(0.5, 0.5);                    // create text object
+        this.updatePoints();        // update the expected points
 
     }
 
@@ -159,6 +166,8 @@ export default class EstimateScene extends Phaser.Scene {
 
         this.numbers[i].setText(newNumber.toString());
 
+        this.updatePoints();        // update the expected points
+
     }
 
     // Start game
@@ -166,20 +175,29 @@ export default class EstimateScene extends Phaser.Scene {
 
         this.scene.stop('Overview');        // stop the overview scene (which is currently paused)
 
-        this.gameData.time = 0;
+        this.gameData.time = 0;                 // reset estimated time
 
-        // get estimated time (from strings)
+        this.gameData.time = this.getEstimatedTime();
+
+        // calculate and update estimated time in gameData
+        this.gameData.expectedPoints = this.calculatePoints(this.getEstimatedTime());
+
+        this.scene.start('Game', this.gameData);        // start first estimation scene with 0 points
+
+    }
+
+    // get the estimated time from the number strings
+    getEstimatedTime(): number {
+
+        let estimatedTime = 0;
+
         for (let i = 0; i < this.numbers.length; i++) {
 
-            this.gameData.time += Number(this.numbers[i].text) * 10**(this.numbers.length - 1 - i);
+            estimatedTime += Number(this.numbers[i].text) * 10**(this.numbers.length - 1 - i);
 
         }
 
-        console.log(this.gameData.time);
-
-        this.gameData.expectedPoints = 1000;        // TODO: change expected points
-
-        this.scene.start('Game', this.gameData);        // start first estimation scene with 0 points
+        return estimatedTime;
 
     }
 
@@ -189,6 +207,36 @@ export default class EstimateScene extends Phaser.Scene {
         this.scene.pause();
         this.scene.resume('Overview');
         this.scene.setVisible(true, 'Overview');
+
+    }
+
+    // Calculate the points you get based on the estimated time
+    calculatePoints(estimatedTime: number): number {
+
+        // get the par time from the level
+        const levelNumber: number = this.gameData.level;                // get the number of the level
+        const levelString: string = 'level' + levelNumber.toString();   // create the string with the level name (key to the loaded json)
+        const parTime = this.cache.json.get(levelString).partime;  // get the data from the json
+
+        // calculate slope and offset (y = a*x + b, point = slope * estimated time + offset)
+        const slope = gameOptions.parTimePoints / (parTime - gameOptions.zeroPointTimeFactor * parTime);    // calculate the slope based on two points, 1: par time points, 2: time where you get zero points
+        const offset = gameOptions.parTimePoints - slope * parTime;                                         // calculate the offset based on one point (par time points) and the slope (b = y - a * x)
+
+        const points = Math.round(slope * estimatedTime + offset);              // calculate and return expected points
+
+        if (points < 0) {
+            return 0;
+        }
+        else {
+            return points;
+        }
+
+    }
+
+    // Update the expected points
+    updatePoints() {
+
+        this.expectedPoints.setText(this.calculatePoints(this.getEstimatedTime()).toString());
 
     }
 

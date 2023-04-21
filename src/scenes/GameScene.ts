@@ -14,6 +14,7 @@ export default class GameScene extends Phaser.Scene {
     private objectives!: Objective[];
     private indicators!: Indicator[];
     private gameData!: GameData;
+    private gameRunning!: boolean;
 
     // Constructor
     constructor() {
@@ -28,9 +29,13 @@ export default class GameScene extends Phaser.Scene {
         // get game data
         this.gameData = data;
 
+        // reset collision counter
+        this.gameData.collisions = 0;
+
         // initialize variables
         this.objectives = [];
         this.indicators = [];
+        this.gameRunning = false;       // make the game not running (timer not running at the beginning)
 
     }
 
@@ -38,7 +43,7 @@ export default class GameScene extends Phaser.Scene {
     create(): void {
 
         // start UI scene
-        this.scene.launch('GameUI', {time: this.gameData.time});
+        this.scene.launch('GameUI', this.gameData);
 
         // create the world
         this.createWorld();
@@ -75,7 +80,7 @@ export default class GameScene extends Phaser.Scene {
     addControls(): void {
 
         // add keyboard controls
-        this.input.keyboard!.addKey('Space').on('down', function(this: GameScene) { this.inputPressed();}, this);
+        this.input.keyboard?.addKey('Space').on('down', function(this: GameScene) { this.inputPressed();}, this);
 
         // add mouse and touch controls
         this.input.on('pointerdown', function(this: GameScene) { this.inputPressed(); }, this);
@@ -85,6 +90,13 @@ export default class GameScene extends Phaser.Scene {
     // Action which happens when input is provided: Change direction of the spaceship
     inputPressed(): void {
 
+        if (!this.gameRunning) {
+            this.gameRunning = true;
+
+            eventsCenter.emit('startgame');
+
+        }
+
         this.ship.changeDirection();
 
     }
@@ -92,13 +104,20 @@ export default class GameScene extends Phaser.Scene {
     // setup all the events and make sure they are also cleaned up at the end
     eventsHandlingSetup() {
 
+        // event when the ship collides with blocks
+        eventsCenter.on('blockCollide', function(this: GameScene) {
+
+            this.gameData.collisions! += 1;
+
+        }, this);
+
         // event when ship collides with objective
         eventsCenter.on('objectiveCollide', function(this: GameScene, objective: Objective) {
 
             const index = this.objectives.indexOf(objective);               // get the index of the objective in the array
 
             this.indicators[index].destroy();                               // destroy the indicator
-            this.indicators.splice(index, 1);                               // remove the indicator from the list of indicators
+            this.indicators.splice(index, 1);                     // remove the indicator from the list of indicators
 
             objective.destroy();                                            // destroy the objective
             this.objectives.splice(index, 1);                     // remove it from the list of objectives
@@ -106,18 +125,26 @@ export default class GameScene extends Phaser.Scene {
 
             if (this.objectives.length < 1) {
 
-                this.gameData.damagePoints = 99;                            // set damage points
-                this.gameData.successful = true;                            // set if it was successful or not
-
-                this.scene.start('Points', this.gameData);              // go to the points scene
+                this.levelOver(true);                               // level is over with success
+                
             }
 
         }, this);
 
+        // event when the time is up
+        eventsCenter.once('timeUp', function(this: GameScene) {
+
+            this.levelOver(false);      // level is over and you did not make it on time (success: no)
+
+        }, this);
+
         // Cleanup the events when the scene is shut down
-        this.events.on(Phaser.Scenes.Events.SHUTDOWN, function() {
+        this.events.once(Phaser.Scenes.Events.SHUTDOWN, function() {
             eventsCenter.off('objectiveCollide');
+            eventsCenter.off('blockCollide');
+            eventsCenter.off('timeUp');
         });
+
 
     }
 
@@ -180,6 +207,27 @@ export default class GameScene extends Phaser.Scene {
 
         }
 
+    }
+    
+    // level is over (either by elapsing time or by collecting all objectives)
+    levelOver(successful: boolean) {
+
+        this.gameData.successful = successful;                      // set the success
+        
+        if (successful) {          // successful
+
+            console.log('you won');     // TODO: Add here other things
+
+        }
+        else {
+
+            console.log('you lost');    // TODO: Add here other things
+
+        }
+
+        this.scene.stop('GameUI');
+        this.scene.start('Points', this.gameData);              // go to the points scene
+        
     }
 
 }

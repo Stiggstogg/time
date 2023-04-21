@@ -33,6 +33,7 @@ export default class EditorScene extends Phaser.Scene {
     private otherKeys!: OtherKeys;
     private selectedObject!: Phaser.GameObjects.Sprite;
     private blockGUI!: dat.GUI;
+    private partime!: number;
 
     // Constructor
     constructor() {
@@ -156,7 +157,6 @@ export default class EditorScene extends Phaser.Scene {
         this.cameras.main.setScroll(gameOptions.worldWidth / 2, gameOptions.worldHeight - gameOptions.gameHeight);
         this.cameras.main.setZoom(gameOptions.gameWidth / gameOptions.worldWidth);
 
-
     }
 
     // Create level
@@ -166,6 +166,9 @@ export default class EditorScene extends Phaser.Scene {
         const levelNumber: number = this.gameData.level;                // get the number of the level
         const levelString: string = 'level' + levelNumber.toString();   // create the string with the level name (key to the loaded json)
         const levelData: LevelData = this.cache.json.get(levelString);  // get the data from the json
+
+        // set par time
+        this.partime = levelData.partime;
 
         // place the ship
         this.ship = this.add.sprite(
@@ -206,6 +209,7 @@ export default class EditorScene extends Phaser.Scene {
 
         // create object will ships, blocks and objectives
         let levelDataObject: LevelData = {                  // create object and add ship data
+            partime: this.partime,
             ship: {
                 x: this.ship.x / gameOptions.worldWidth,
                 y: this.ship.y / gameOptions.worldHeight

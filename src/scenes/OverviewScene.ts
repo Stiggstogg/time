@@ -1,8 +1,11 @@
 import Phaser from 'phaser';
 import gameOptions from '../helper/gameOptions';
+import {GameData, LevelData} from "../helper/interfaces";
 
 // "Overview" scene: Scene where you see the overview of the level
 export default class OverviewScene extends Phaser.Scene {
+
+    private level!: number;
 
     // Constructor
     constructor() {
@@ -12,21 +15,27 @@ export default class OverviewScene extends Phaser.Scene {
     }
 
     // Initialize parameters
-    init(): void {
+    init(data: GameData): void {
 
         // make this scene directly invisible when it is started (needs to be done like that as start / launch makes it visible again)
         this.scene.setVisible(false);
+
+        // get game data
+        this.level = data.level;        // get the level number
 
     }
 
     // Shows the all objects of this scene
     create(): void {
 
-        // add background
-        this.add.image(0, 0, 'background').setOrigin(0);
+        // create world (background and camera
+        this.createWorld();
+
+        // draw level
+        this.drawLevel();
 
         // Add title
-        this.add.text(gameOptions.gameWidth / 2, gameOptions.gameHeight * 0.2, 'Overview', gameOptions.textStyles[0]).setOrigin(0.5, 0.5);
+        //this.add.text(gameOptions.gameWidth / 2, gameOptions.gameHeight * 0.2, 'Overview', gameOptions.textStyles[0]).setOrigin(0.5, 0.5);
 
         // Add buttons
         this.addButtons();
@@ -39,6 +48,60 @@ export default class OverviewScene extends Phaser.Scene {
 
     }
 
+
+    // create world (background and boundaries)
+    createWorld() {
+
+        // set camera
+        this.cameras.main.setBounds(0, 0, gameOptions.worldWidth, gameOptions.worldHeight);
+        this.cameras.main.setScroll(gameOptions.worldWidth / 2, gameOptions.worldHeight - gameOptions.gameHeight);
+        this.cameras.main.setZoom(gameOptions.gameWidth / gameOptions.worldWidth);
+
+        // add background
+        this.add.image(0, 0, 'backgroundMap').setOrigin(0);
+
+
+    }
+
+    // create level
+    drawLevel() {
+
+        // get the level and the data
+        const levelString: string = 'level' + this.level.toString();   // create the string with the level name (key to the loaded json)
+        const levelData: LevelData = this.cache.json.get(levelString);  // get the data from the json
+
+        // place the ship
+        this.add.image(
+            gameOptions.worldWidth * levelData.ship.x,
+            gameOptions.worldHeight * levelData.ship.y,
+            'ship'
+        );
+
+        // place all blocks
+        for (let i = 0; i < levelData.blocks.length; i++) {
+
+            this.add.image(
+                gameOptions.worldWidth * levelData.blocks[i].x,
+                gameOptions.worldHeight * levelData.blocks[i].y,
+                'block',
+            ).setAngle(levelData.blocks[i].angle)
+                .setDisplaySize(
+                    gameOptions.worldWidth * levelData.blocks[i].width,
+                    gameOptions.worldHeight * levelData.blocks[i].height)
+                .setTint(0x000000);
+        }
+
+        // place all objectives
+        for (let i = 0; i < levelData.objectives.length; i++) {
+
+            this.add.image(
+                gameOptions.worldWidth * levelData.objectives[i].x,
+                gameOptions.worldHeight * levelData.objectives[i].y,
+                'objective',
+            );
+
+        }
+    }
 
     // Add buttons including controls
     addButtons() {
