@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import gameOptions from '../helper/gameOptions';
+import Bubble from '../sprites/Bubble';
 
 // "Home" scene: Main game menu scene
 export default class HomeScene extends Phaser.Scene {
@@ -7,7 +8,6 @@ export default class HomeScene extends Phaser.Scene {
     private title!: Phaser.GameObjects.Text;
     private titleText!: string;
     private menuEntries!: string[];
-    private titleStyle!: Phaser.Types.GameObjects.Text.TextStyle;
     private inactiveStyle!: Phaser.Types.GameObjects.Text.TextStyle;
     private activeStyle!: Phaser.Types.GameObjects.Text.TextStyle;
     private selected!: number;
@@ -25,21 +25,13 @@ export default class HomeScene extends Phaser.Scene {
     init(): void {
 
         // title text
-        this.titleText = 'TIME';
+        this.titleText = 'Birds!';
 
         // menu entries
         this.menuEntries = [
             'FLY',
             'How to Play',
         ];
-
-        // styles of the title menu entries (active or inactive) and instruction text
-        this.titleStyle = {
-            fontFamily: 'Arial',
-            fontSize: '70px',
-            color: '#FFFF00',
-            fontStyle: 'bold'
-        }
 
         this.inactiveStyle = {
             fontFamily: 'Arial',
@@ -64,8 +56,8 @@ export default class HomeScene extends Phaser.Scene {
     // Shows the home screen and waits for the user to select a menu entry
     create(): void {
 
-        // Title
-        this.title = this.add.text(gameOptions.gameWidth / 2, gameOptions.gameHeight * 0.2, this.titleText, this.titleStyle).setOrigin(0.5, 0.5);
+        // Add background and images
+        this.addBackgroundImages();
 
         // Create the menu with its entries
         this.createMenu(this.menuEntries);
@@ -78,11 +70,41 @@ export default class HomeScene extends Phaser.Scene {
 
     }
 
+    // Adds the background and images
+    addBackgroundImages() {
+
+        // background
+        this.add.image(0, 0, 'backgroundMenu').setOrigin(0).setDepth(0);
+
+        // title
+        this.title = this.add.text(
+            gameOptions.gameWidth / 2,
+            gameOptions.gameHeight * 0.1,
+            this.titleText,
+            gameOptions.textStyles[0]).setOrigin(0.5);
+
+        // add first bubble
+        this.add.existing(new Bubble(this,
+            0,
+            gameOptions.gameHeight * 0.2,
+            'Hallo, I am the mighty OVERLORD and there is absolutely nothing to see here! We are just testing'
+            ));
+
+
+        // add the overlord
+        this.add.image(
+            gameOptions.gameWidth / 2,
+            gameOptions.gameHeight * 0.5,
+            'overlord'
+        );
+
+    }
+
     // Creates the menu with its entries and sets the styles for it
     createMenu(menuEntries: string[]): void {
 
         // start position and y space between the entries
-        const start = {x: gameOptions.gameWidth / 2, y: this.title.y + gameOptions.gameHeight * 0.2};      // start position
+        const start = {x: gameOptions.gameWidth / 2, y: this.title.y + gameOptions.gameHeight * 0.7};      // start position
         const ySpace = gameOptions.gameHeight * 0.1;                                         // ySpace between the entries
 
         // create menu items (loop through each item)

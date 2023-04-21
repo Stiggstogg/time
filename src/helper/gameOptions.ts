@@ -74,17 +74,17 @@ class GameOptions {
 
         // Text style 0:
         this.textStyles.push({
-            fontFamily: 'Arial',
-            fontSize: '70px',
+            fontFamily: 'Orbitron',
+            fontSize: '100px',
             color: '#FFFF00',
             fontStyle: 'bold'
         });
 
         // Text style 1:
         this.textStyles.push({
-            fontFamily: 'Arial',
-            fontSize: '40px',
-            color: '#ffff00',
+            fontFamily: 'Orbitron',
+            fontSize: '24px',
+            color: '#000000',
             fontStyle: ''
         });
 
