@@ -84,6 +84,14 @@ class GameOptions {
         this.textStyles.push({
             fontFamily: 'Orbitron',
             fontSize: '24px',
+            color: '#FFFF00',
+            fontStyle: ''
+        });
+
+        // Text style 2:
+        this.textStyles.push({
+            fontFamily: 'Orbitron',
+            fontSize: '24px',
             color: '#000000',
             fontStyle: ''
         });

@@ -15,6 +15,8 @@ export default class GameScene extends Phaser.Scene {
     private indicators!: Indicator[];
     private gameData!: GameData;
     private gameRunning!: boolean;
+    private engineLeft!: Phaser.GameObjects.Particles.ParticleEmitter;
+    private engineRight!: Phaser.GameObjects.Particles.ParticleEmitter;
 
     // Constructor
     constructor() {
@@ -73,6 +75,9 @@ export default class GameScene extends Phaser.Scene {
             this.indicators[i].update();
         }
 
+        // update the particles (exhaust)
+        this.updateParticles();
+
 
     }
 
@@ -98,6 +103,16 @@ export default class GameScene extends Phaser.Scene {
         }
 
         this.ship.changeDirection();
+
+        // turn engine on or off
+        if (this.ship.turnFactor == -1) {
+            this.engineLeft.stop();
+            this.engineRight.start();
+        }
+        else {
+            this.engineRight.stop();
+            this.engineLeft.start();
+        }
 
     }
 
@@ -206,6 +221,43 @@ export default class GameScene extends Phaser.Scene {
             this.indicators.push(this.add.existing(new Indicator(this, this.ship, this.objectives[i])));
 
         }
+
+        // add particle emitter (but do not emit yet) for the two exhausts (left and right)
+        const particleConfig = {
+            color: [ 0xffffff, 0xffff00, 0xff0000, 0x000000  ],
+                colorEase: 'quart.out',
+            lifespan: 300,
+            angle: {min: 70, max: 110},
+            scale: {start: 1, end: 0, ease: 'sine.in'},
+            speed: {min: 200, max: 400},
+            quantity: 5,
+            emitting: false
+        }
+
+        this.engineLeft = this.add.particles(0, 0, 'particle', particleConfig);         // left engine
+        this.engineRight = this.add.particles(0, 0, 'particle', particleConfig);        // right engine
+
+        this.engineLeft.start();                                                                    // turn left engine on
+
+    }
+
+    updateParticles(): void {
+
+        const angleRad = Phaser.Math.DegToRad(this.ship.angle);       // angle of the ship in radians
+
+        // set angles
+        this.engineLeft.setAngle(this.ship.angle);                       // set the angle of the engine
+        this.engineRight.setAngle(this.ship.angle);
+
+        this.engineLeft.setPosition(
+            this.ship.xgeo - this.ship.height / 2 * Math.sin(angleRad) - this.ship.width / 4 * Math.cos(angleRad),
+            this.ship.ygeo + this.ship.height / 2 * Math.cos(angleRad) - this.ship.width / 4 * Math.sin(angleRad)
+        );
+
+        this.engineRight.setPosition(
+            this.ship.xgeo - this.ship.height / 2 * Math.sin(angleRad) + this.ship.width / 4 * Math.cos(angleRad),
+            this.ship.ygeo + this.ship.height / 2 * Math.cos(angleRad) + this.ship.width / 4 * Math.sin(angleRad)
+        );
 
     }
     

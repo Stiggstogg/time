@@ -14,7 +14,7 @@ export default class Bubble extends Phaser.GameObjects.Container {
         const textY = 0.05;         // y position where the text starts (top left, relative to game width)
 
         // text
-        const style = gameOptions.textStyles[1];
+        const style = gameOptions.textStyles[2];
         style.wordWrap = {                                      // set the width
                 width: gameOptions.gameWidth - 2 * textX * gameOptions.gameWidth
             }

@@ -13,6 +13,7 @@ import backgroundMapImg from '../assets/images/backgroundMap.png';
 import backgroundMenuImg from '../assets/images/backgroundMenu.png';
 import bubbleImg from '../assets/images/bubble.png';
 import overlordImg from '../assets/images/overlord.png';
+import particleImg from '../assets/images/particle.png';
 
 // Levels
 import level0Json from '../assets/json/level0.json';
@@ -92,6 +93,7 @@ export default class LoadingScene extends Phaser.Scene {
         this.load.image('backgroundMap', backgroundMapImg);
         this.load.image('backgroundMenu', backgroundMenuImg);
         this.load.image('overlord', overlordImg);
+        this.load.image('particle', particleImg);
 
         // load spritesheets
         this.load.spritesheet('bubble', bubbleImg, {frameWidth: 540, frameHeight: 50});

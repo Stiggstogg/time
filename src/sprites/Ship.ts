@@ -6,12 +6,13 @@ import ShipSensor from "./ShipSensor";
 // Ship class
 export default class Ship extends Phaser.Physics.Matter.Sprite {
 
-    private turnFactor: number;         // factor which is used to indicate the direction it is moving (1: clockwise, -1: counterclockwise)
+    public turnFactor: number;         // factor which is used to indicate the direction it is moving (1: clockwise, -1: counterclockwise)
     private isTumbling: boolean;        // ship is tumbling when it collided with a wall and is on the way back to a save position
     private tumblingStartTime: number;  // time when the tumbling has started (used to calculate how long the ship should tumble
     private isIdle: boolean;            // ship is idle when it is standing in one place and rotating (at the start and after a collision)
-    private sensor: ShipSensor;
-
+    private sensor: ShipSensor;         // sensor which detects where the last save position of the ship was
+    public xgeo: number;               // x coordinate of the geometrical center of the ship (middle point of the bounding box around the triangle)
+    public ygeo: number;               // y coordinate of the geometrical center of the ship (middle point of the bounding box around the triangle)
 
     // Constructor
     constructor(scene: Phaser.Scene, x: number, y: number) {
@@ -45,6 +46,8 @@ export default class Ship extends Phaser.Physics.Matter.Sprite {
         this.isTumbling = false;                // ship is not tumbling at the beginning
         this.isIdle = true;                     // ship is idle at the beginning
         this.tumblingStartTime = Date.now();   // set the tumbling start time to now
+        this.xgeo = this.x;                     // set the geometrical middle point coordinates
+        this.ygeo = this.y - this.height / 6;   // set the geometrical middle point coordinates
 
         this.setBounce(gameOptions.shipBounce);
 
@@ -72,11 +75,17 @@ export default class Ship extends Phaser.Physics.Matter.Sprite {
 
     update(): void {
 
-        this.sensor.update();
+        // set the geometrical middle point coordinates (calculation is based on the fact that the center of mass is at height / 3)
+        this.xgeo = this.x + this.height * Math.sin(Phaser.Math.DegToRad(this.angle)) / 6;
+        this.ygeo = this.y - this.height * Math.cos(Phaser.Math.DegToRad(this.angle)) / 6;
+
+        // sensor update
+        this.sensor.update();                   // update the sensor
 
         this.sensor.moveTo(this.x, this.y);     // move the sensor together with the ship
 
-        if (this.isTumbling) {
+        // check for tumbling, idle or flying
+        if (this.isTumbling) {                  // tumbling
 
             this.setAngularVelocity(this.turnFactor * gameOptions.shipTumblingRotationSpeed);
 
@@ -86,12 +95,12 @@ export default class Ship extends Phaser.Physics.Matter.Sprite {
             }
 
         }
-        else if (this.isIdle) {
+        else if (this.isIdle) {                 // idle (rotating, e.g. at the start and after a crash)
 
             this.setAngularVelocity(this.turnFactor * gameOptions.shipRotationSpeed);
 
         }
-        else {
+        else {                                  // when the ship is moving
 
             this.setAngularVelocity(this.turnFactor * gameOptions.shipRotationSpeed);
 
