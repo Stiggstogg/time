@@ -4,9 +4,9 @@ import Phaser from 'phaser';
 export default class Objective extends Phaser.Physics.Matter.Image {
 
     // Constructor
-    constructor(scene: Phaser.Scene, x: number, y: number, color: number) {
+    constructor(scene: Phaser.Scene, x: number, y: number) {
 
-        super(scene.matter.world, x, y, 'objective');
+        super(scene.matter.world, x, y, 'birdSmall');
 
         this.setBody({                            // MatterSetBodyConfig: configuration of the collision body itself
             type: 'circle',                             // set the type to rectangle (basically not needed as it is the default
@@ -17,7 +17,7 @@ export default class Objective extends Phaser.Physics.Matter.Image {
         });
 
         // set color
-        this.setTint(color);
+        //this.setTint(color);
 
         // set collision category and with whom it collides
         this.setCollisionCategory(2);   // category needs to be a power of 2, e.g. 1, 2, 4, 8,...!

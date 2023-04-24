@@ -1,17 +1,16 @@
 import Phaser from 'phaser';
 import gameOptions from '../helper/gameOptions';
 import Bubble from '../sprites/Bubble';
+import Button from "../sprites/Button";
 
 // "Home" scene: Main game menu scene
 export default class HomeScene extends Phaser.Scene {
 
-    private title!: Phaser.GameObjects.Text;
     private titleText!: string;
-    private menuEntries!: string[];
-    private inactiveStyle!: Phaser.Types.GameObjects.Text.TextStyle;
-    private activeStyle!: Phaser.Types.GameObjects.Text.TextStyle;
-    private selected!: number;
-    private items!: Phaser.GameObjects.Text[];
+    private textOverlord!: string;
+    private textCreep!: string;
+    private buttonGo!: Button;
+    private buttonHow!: Button;
 
 
     // Constructor
@@ -27,183 +26,102 @@ export default class HomeScene extends Phaser.Scene {
         // title text
         this.titleText = 'Birds!';
 
-        // menu entries
-        this.menuEntries = [
-            'FLY',
-            'How to Play',
-        ];
+        // texts
+        this.textOverlord = 'I am the mighty OVERLORD!\n\n' +
+            'I invaded earth and built many G5 towers. ' +
+            'Unfortunately, because of the electromagnetic radiation my SPY BIRDS got lost and flew into space.\n' +
+            'The faster you find them the more CREEPZ DOLLARZ (CZD) you will get!\n\n' +
+            'Who will take over this noble task?';
 
-        this.inactiveStyle = {
-            fontFamily: 'Arial',
-            fontSize: '40px',
-            color: '#ffff00',
-            fontStyle: '',
-        }
-
-        this.activeStyle = {
-            fontFamily: 'Arial',
-            fontSize: '50px',
-            color: '#0000ff',
-            fontStyle: 'bold',
-        }
-
-        // initialize empty parameters
-        this.selected = 0;
-        this.items = [];
+        this.textCreep = 'Me, my mighty OVERLORD!\n\n\n\n' +
+            'Can you show me... \n\n\n\n'
 
     }
 
     // Shows the home screen and waits for the user to select a menu entry
     create(): void {
 
-        // Add background and images
-        this.addBackgroundImages();
+        // Create all the elements for the menu
+        this.createElements();
 
-        // Create the menu with its entries
-        this.createMenu(this.menuEntries);
-
-        // Add keyboard inputs
-        this.addKeys();
-
-        // Add mobile controls
-        this.addMobileControls();
+        // Add the button actions
+        this.addButtonActions();
 
     }
 
-    // Adds the background and images
-    addBackgroundImages() {
+    // Create all menu elements (buttons, bubbles, title,...)
+    createElements() {
 
         // background
         this.add.image(0, 0, 'backgroundMenu').setOrigin(0).setDepth(0);
 
         // title
-        this.title = this.add.text(
+        this.add.text(
             gameOptions.gameWidth / 2,
             gameOptions.gameHeight * 0.1,
             this.titleText,
             gameOptions.textStyles[0]).setOrigin(0.5);
 
-        // add first bubble
+        // add overlord bubble
         this.add.existing(new Bubble(this,
             0,
-            gameOptions.gameHeight * 0.2,
-            'Hallo, I am the mighty OVERLORD and there is absolutely nothing to see here! We are just testing'
-            ));
+            gameOptions.gameHeight * 0.15,
+            this.textOverlord,
+            'bottomRight'));
 
 
         // add the overlord
         this.add.image(
-            gameOptions.gameWidth / 2,
-            gameOptions.gameHeight * 0.5,
+            gameOptions.gameWidth * 0.83,
+            gameOptions.gameHeight * 0.55,
             'overlord'
         );
 
-    }
+        // add the bird
+        this.add.image(
+            gameOptions.gameWidth * 0.3,
+            gameOptions.gameHeight * 0.625,
+            'bird'
+        ).setOrigin(0.5, 1);
 
-    // Creates the menu with its entries and sets the styles for it
-    createMenu(menuEntries: string[]): void {
+        // add the creep bubble
+        this.add.existing(new Bubble(this,
+            0,
+            gameOptions.gameHeight * 0.61,
+            this.textCreep,
+            'bottomLeft'));
 
-        // start position and y space between the entries
-        const start = {x: gameOptions.gameWidth / 2, y: this.title.y + gameOptions.gameHeight * 0.7};      // start position
-        const ySpace = gameOptions.gameHeight * 0.1;                                         // ySpace between the entries
+        // add the creep
+        this.add.image(
+            gameOptions.gameWidth * 0.17,
+            gameOptions.gameHeight * 0.92,
+            'creep'
+        );
 
-        // create menu items (loop through each item)
+        // add the lets go go button
+        this.buttonGo = this.add.existing(new Button(this,
+            gameOptions.gameWidth * 0.5,
+            gameOptions.gameHeight * 0.7,
+            'LET\'S GO!'
+        ));
 
-        let menuItemTemp: Phaser.GameObjects.Text;
-
-
-        for (let i = 0;i < menuEntries.length; i++) {
-
-            menuItemTemp = this.add.text(start.x, start.y + i * ySpace, menuEntries[i]);    // create menu entry
-            menuItemTemp.setOrigin(0.5);                                                    // set origin
-            menuItemTemp.setInteractive();                                                      // enable touch (controls will be set later
-
-            this.items.push(menuItemTemp);
-
-        }
-
-        this.highlightSelected();         // highlight the selected entry
-    }
-
-    // Select the next menu entry (when clicking down)
-    selectNext(): void {
-
-        // select the next, or if it is the last entry select the first again
-        if (this.selected >= this.items.length - 1) {
-            this.selected = 0;              // select the first entry
-        }
-        else {
-            this.selected++;                // select the previous entry
-        }
-
-        // highlight the selected entry
-        this.highlightSelected();
+        // add the lets go button
+        this.buttonHow = this.add.existing(new Button(this,
+            gameOptions.gameWidth * 0.5,
+            gameOptions.gameHeight * 0.81,
+            '...how?'
+        ));
 
     }
 
-    // Select the previous menu entry (when clicking up)
-    selectPrevious(): void {
+    // add all the actions to the buttons
+    addButtonActions() {
 
-        // select the previous, or if it is the first entry select the last again
-        if (this.selected <= 0) {
-            this.selected = this.items.length -1;   // select the last entry
-        }
-        else {
-            this.selected--;                        // select the previous entry
-        }
+        // "Let's Go" button
+        this.buttonGo.button.on('pointerdown', this.startGame, this)   // start the game when this button is pressed
 
-        // highlight the selected entry
-        this.highlightSelected();
-
-    }
-
-     // Highlights the selected entry (changing the styles of the deselected and selected entries)
-    highlightSelected(): void {
-
-        for (let i in this.items) {
-            this.items[i].setStyle(this.inactiveStyle);         // change the style of all entries to the inactive style
-        }
-
-        this.items[this.selected].setStyle(this.activeStyle);   // change the style of the selected entry to the active style
-
-    }
-
-     // Add keyboard input to the scene.
-    addKeys(): void {
-
-        // up and down keys (moving the selection of the entries)
-        this.input.keyboard?.addKey('Down').on('down', function(this: HomeScene) { this.selectNext() }, this);
-        this.input.keyboard?.addKey('S').on('down', function(this: HomeScene) { this.selectNext() }, this);
-        this.input.keyboard?.addKey('Up').on('down', function(this: HomeScene) { this.selectPrevious() }, this);
-        this.input.keyboard?.addKey('W').on('down', function(this: HomeScene) { this.selectPrevious() }, this);
-
-        // enter and space key (confirming a selection)
-        this.input.keyboard?.addKey('Enter').on('down', function(this: HomeScene) { this.spaceEnterKey() }, this);
-        this.input.keyboard?.addKey('Space').on('down', function(this: HomeScene) { this.spaceEnterKey() }, this);
-
-    }
-
-    addMobileControls() {
-
-        this.items[0].on('pointerdown', this.startGame, this);      // start game when the first entry is selected
-        this.items[1].on('pointerdown', this.startHowTo, this);      // start game when the second entry is selected
-
-    }
-
-    // Action which happens when the enter or space key is pressed.
-    spaceEnterKey() {
-
-        switch(this.selected) {
-            case 0:                 // start the game when the first entry is selected ("Start")
-                this.startGame();
-                break;
-            case 1:                 // start the "Howto" scene when the "How To Play" entry is selected
-                this.startHowTo();
-                break;
-            default:
-                this.startGame();   // start the game by default
-                break;
-        }
+        // "how?" button
+        this.buttonHow.button.on('pointerdown', this.startHowTo, this)   // go to the tutorial when this button is pressed
 
     }
 

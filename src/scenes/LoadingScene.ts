@@ -8,12 +8,20 @@ import blockImg from '../assets/images/block.png';
 import objectiveImg from '../assets/images/objective.png';
 import placeholderImg from '../assets/images/placeholder.png';
 import indicatorImg from '../assets/images/indicator.png';
-import timechangerImg from '../assets/images/timechanger.png';
+import timeChangerImg from '../assets/images/timechanger.png';
 import backgroundMapImg from '../assets/images/backgroundMap.png';
+import frameMapImg from '../assets/images/frameMap.png';
 import backgroundMenuImg from '../assets/images/backgroundMenu.png';
+import backgroundEstimateImg from '../assets/images/backgroundEstimate.png';
 import bubbleImg from '../assets/images/bubble.png';
+import bubbleArrowImg from '../assets/images/bubble-arrow.png';
 import overlordImg from '../assets/images/overlord.png';
+import creepImg from '../assets/images/creep.png';
+import birdImg from '../assets/images/bird.png';
+import birdSmallImg from '../assets/images/birdSmall.png';
+import buttonImg from '../assets/images/button.png';
 import particleImg from '../assets/images/particle.png';
+import uiFlyImg from '../assets/images/uiFly.png';
 
 // Levels
 import level0Json from '../assets/json/level0.json';
@@ -89,14 +97,22 @@ export default class LoadingScene extends Phaser.Scene {
         this.load.image('objective', objectiveImg);
         this.load.image('placeholder', placeholderImg);
         this.load.image('indicator', indicatorImg);
-        this.load.image('timechanger', timechangerImg);
         this.load.image('backgroundMap', backgroundMapImg);
+        this.load.image('frameMap', frameMapImg);
         this.load.image('backgroundMenu', backgroundMenuImg);
+        this.load.image('backgroundEstimate', backgroundEstimateImg);
         this.load.image('overlord', overlordImg);
+        this.load.image('creep', creepImg);
+        this.load.image('bird', birdImg);
+        this.load.image('birdSmall', birdSmallImg);
+        this.load.image('button', buttonImg);
         this.load.image('particle', particleImg);
+        this.load.image('bubbleArrow', bubbleArrowImg);
+        this.load.image('uiFly', uiFlyImg);
 
-        // load spritesheets
-        this.load.spritesheet('bubble', bubbleImg, {frameWidth: 540, frameHeight: 50});
+        // load sprite sheets
+        this.load.spritesheet('bubble', bubbleImg, {frameWidth: 540, frameHeight: 29});
+        this.load.spritesheet('timeChanger', timeChangerImg, {frameWidth: 55, frameHeight: 59});
 
         // load audio
         //this.load.audio('miss', 'assets/audio/Pew.mp3');

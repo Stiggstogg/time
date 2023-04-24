@@ -5,6 +5,7 @@ class GameOptions {
 
     public readonly gameWidth: number;
     public readonly gameHeight: number;
+    public readonly uiHeight: number;
     private readonly worldFactor: number;
     public readonly worldWidth: number;
     public readonly worldHeight: number;
@@ -33,6 +34,9 @@ class GameOptions {
         // Width and height of the game (canvas)
         this.gameWidth = 540;
         this.gameHeight = 1140;
+
+        // Height of the UI (in the game scene)
+        this.uiHeight = 50;
 
         // factor to calculate the world size
         this.worldFactor = 3;
@@ -72,7 +76,7 @@ class GameOptions {
 
         this.textStyles = [];
 
-        // Text style 0:
+        // Text style 0: Title
         this.textStyles.push({
             fontFamily: 'Orbitron',
             fontSize: '100px',
@@ -80,20 +84,44 @@ class GameOptions {
             fontStyle: 'bold'
         });
 
-        // Text style 1:
+        // Text style 1:Bubble text but highlighted
         this.textStyles.push({
             fontFamily: 'Orbitron',
-            fontSize: '24px',
-            color: '#FFFF00',
-            fontStyle: ''
+            fontSize: '32px',
+            color: '#000000',
+            fontStyle: 'bold'
         });
 
-        // Text style 2:
+        // Text style 2: Text in bubbles
         this.textStyles.push({
             fontFamily: 'Orbitron',
             fontSize: '24px',
             color: '#000000',
             fontStyle: ''
+        });
+
+        // Text style 3: Text on buttons
+        this.textStyles.push({
+            fontFamily: 'Orbitron',
+            fontSize: '32px',
+            color: '#ffffff',
+            fontStyle: 'bold'
+        });
+
+        // Text style 4: Text for titles in the different screens
+        this.textStyles.push({
+            fontFamily: 'Orbitron',
+            fontSize: '48px',
+            color: '#ffffff',
+            fontStyle: 'bold'
+        });
+
+        // Text style 5: Fly UI text
+        this.textStyles.push({
+            fontFamily: 'Orbitron',
+            fontSize: '32px',
+            color: '#ffffff',
+            fontStyle: 'bold'
         });
 
         // -----------------------------

@@ -37,6 +37,9 @@ export default class GameUIScene extends Phaser.Scene {
     // Shows the all objects of this scene
     create(): void {
 
+        // add UI on top
+        this.add.image(0, 0, 'uiFly').setOrigin(0);
+
         // add texts
         this.addTexts();
 
@@ -71,22 +74,30 @@ export default class GameUIScene extends Phaser.Scene {
     addTexts() {
 
         // Stats position
-        const statsY = 0.05;
+        const statsY = 0.045;
 
         // Add text for the time
-        this.timeText = this.add.text(gameOptions.gameWidth * 0.2, gameOptions.gameWidth * statsY,
-            ' ', gameOptions.textStyles[1]).setOrigin(1, 0.5);
+        this.timeText = this.add.text(
+            gameOptions.gameWidth * 0.29,
+            gameOptions.gameWidth * statsY,
+            ' ',
+            gameOptions.textStyles[5])
+            .setOrigin(1, 0.5);
         this.setTimerText(this.remainingTime);
         this.timeText.setDepth(0);
 
         // Add text for level
-        const levelText = 'Level: ' + this.gameData.level.toString() + '/' + gameOptions.numLevels.toString();
+        const levelText = this.gameData.level.toString() + '/' + gameOptions.numLevels.toString();
         this.add.text(gameOptions.gameWidth * 0.5, gameOptions.gameWidth * statsY,
-            levelText, gameOptions.textStyles[1]).setOrigin(0.5, 0.5);
+            levelText, gameOptions.textStyles[5]).setOrigin(0.5, 0.5);
 
         // Add collision test
-        this.collisionsText = this.add.text(gameOptions.gameWidth * 0.8, gameOptions.gameWidth * statsY,
-            this.collisionsCounter.toString(), gameOptions.textStyles[1]).setOrigin(1, 0.5);
+        this.collisionsText = this.add.text(
+            gameOptions.gameWidth * 0.88,
+            gameOptions.gameWidth * statsY,
+            this.collisionsCounter.toString(),
+            gameOptions.textStyles[5])
+            .setOrigin(1, 0.5);
 
     }
 

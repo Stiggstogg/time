@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 import gameOptions from '../helper/gameOptions';
 import {GameData} from '../helper/interfaces';
+import Bubble from "../sprites/Bubble";
+import Button from "../sprites/Button";
 
 // "Estimate" scene: Scene where you estimate your time
 export default class EstimateScene extends Phaser.Scene {
@@ -8,6 +10,13 @@ export default class EstimateScene extends Phaser.Scene {
     private gameData!: GameData;
     private numbers!: Phaser.GameObjects.Text[];
     private expectedPoints!: Phaser.GameObjects.Text;
+    private textOverlord1!: string;
+    private textOverlord2!: string;
+    private textCreep!: string;
+    private buttonMap!: Button;
+    private buttonGo!: Button;
+    private bubble2!: Bubble;
+    private bubble3!: Bubble;
 
     // Constructor
     constructor() {
@@ -25,6 +34,15 @@ export default class EstimateScene extends Phaser.Scene {
         // initialize properties
         this.numbers = [];
 
+        // texts
+        this.textOverlord1 = 'I hope you are ready. ' +
+            'I have located a few birds. Have a look at the...\n\n\n\n' +
+            'How long will it take?'
+
+        this.textCreep = 'I can do it in... \n\n\n\n\n\n'
+
+        this.textOverlord2 = 'Ok, if you do it in this time I pay you\n\n'
+
     }
 
     // Shows the all objects of this scene
@@ -33,8 +51,8 @@ export default class EstimateScene extends Phaser.Scene {
         // Setup overview scene
         this.setupOverview();
 
-        // Add title
-        this.add.text(gameOptions.gameWidth / 2, gameOptions.gameHeight * 0.2, 'Estimate', gameOptions.textStyles[0]).setOrigin(0.5, 0.5);
+        // setup elements
+        this.setupElements();
 
         // add numbers
         this.addNumbers();
@@ -43,7 +61,9 @@ export default class EstimateScene extends Phaser.Scene {
         this.addTimeButtons();
 
         // Add buttons
-        this.addButtons();
+        this.addButtonActions();
+
+
 
     }
 
@@ -60,23 +80,132 @@ export default class EstimateScene extends Phaser.Scene {
 
     }
 
-    // Add buttons including controls
-    addButtons() {
+    // Setup elements
+    setupElements() {
 
-        // button to show the overview
-        const buttonOverview = this.add.text(gameOptions.gameWidth / 2, gameOptions.gameHeight * 0.8,
-            'Show Level', gameOptions.textStyles[1]);
-        buttonOverview.setOrigin(0.5, 0.5)                                  // set position
-        buttonOverview.setInteractive();                                      // make interactive
-        buttonOverview.on('pointerdown', this.showOverview, this);      // add touch control
+        // background
+        this.add.image(0, 0, 'backgroundEstimate').setOrigin(0).setDepth(0);
+
+        // title
+        this.add.text(
+            gameOptions.gameWidth / 2,
+            gameOptions.gameHeight * 0.05,
+            'Mission ' + this.gameData.level.toString() + '/' + gameOptions.numLevels.toString(),
+            gameOptions.textStyles[4]
+        ).setOrigin(0.5, 0.5);
+
+        // --------------------
+        // Bubbles and figures
+        // --------------------
+
+        // distances for bubbles and overlord / creep
+        const firstY = 0.08;        // y position of the first bubble (relative to game height)
+        const distanceY1 = [         // distances between the different elements (relative to game)
+            0.22,                   // bubble 1 and overlord 1
+            0.02,                   // overlord 1 and bubble 2
+            0.25,                   // bubble 2 and creep 1
+            0.02,                   // creep 1 and bubble 3
+            0.17,                   // bubble 3 and overlord 2
+            0.02,                   // overlord 2 and bubble 4
+            0.18                    // bubble 4 and creep 2
+        ];
+
+        // first bubble for the overlord
+        const bubble1 = this.add.existing(new Bubble(this,
+            0,
+            gameOptions.gameHeight * firstY,
+            this.textOverlord1,
+            'bottomRight'));
+
+        // add the overlord
+        const overlord1 = this.add.image(
+            gameOptions.gameWidth * 0.83,
+            bubble1.y + gameOptions.gameHeight * distanceY1[0],
+            'overlord'
+        );
+
+        // add the creep bubble
+        this.bubble2 = this.add.existing(new Bubble(this,
+            0,
+            overlord1.y + gameOptions.gameHeight * distanceY1[1],
+            this.textCreep,
+            'bottomLeft'));
+
+        // add the creep
+        const creep1 = this.add.image(
+            gameOptions.gameWidth * 0.17,
+            this.bubble2.y + gameOptions.gameHeight * distanceY1[2],
+            'creep'
+        );
+
+        // second bubble for the overlord
+        this.bubble3 = this.add.existing(new Bubble(this,
+            0,
+            creep1.y + gameOptions.gameHeight * distanceY1[3],
+            this.textOverlord2,
+            'bottomRight'));
+
+        // add the overlord
+        const overlord2 = this.add.image(
+            gameOptions.gameWidth * 0.83,
+            this.bubble3.y + gameOptions.gameHeight * distanceY1[4],
+            'overlord'
+        );
+
+        // add the creep bubble
+        const bubble4 = this.add.existing(new Bubble(this,
+            0,
+            overlord2.y + gameOptions.gameHeight * distanceY1[5],
+            '\n\n\n',
+            'bottomLeft'));
+
+        // add the creep
+        this.add.image(
+            gameOptions.gameWidth * 0.17,
+            bubble4.y + gameOptions.gameHeight * distanceY1[6],
+            'creep'
+        );
+
+        // --------------------
+        // Buttons
+        // --------------------
+
+        // distances
+        const distanceY2 = [         // distances between the different elements (relative to game)
+            0.115,                   // bubble 1 and "map" button
+            0.075                    // bubble 4 and "GO" button
+        ];
+
+        // add map button
+        this.buttonMap = this.add.existing(new Button(this,
+            gameOptions.gameWidth * 0.5,
+            bubble1.y + gameOptions.gameHeight * distanceY2[0],
+            '... map!'
+        ));
+
+        // add map button
+        this.buttonGo = this.add.existing(new Button(this,
+            gameOptions.gameWidth * 0.5,
+            bubble4.y + gameOptions.gameHeight * distanceY2[1],
+            'LET\'S FLY!'
+        ));
+
+        // --------------------
+        // Time frames
+        // --------------------
 
 
-        // button to start flying
-        const buttonFly = this.add.text(gameOptions.gameWidth / 2, gameOptions.gameHeight * 0.9,
-            'Let\'s GO!', gameOptions.textStyles[1]);
-        buttonFly.setOrigin(0.5, 0.5);                                  // set position
-        buttonFly.setInteractive();                                         // make interactive
-        buttonFly.on('pointerdown', this.startFly, this);               // add touch control
+
+    }
+
+    // add all the actions to the buttons
+    addButtonActions() {
+
+        // "Map" button
+        this.buttonMap.button.on('pointerdown', this.showOverview, this)   // Show the overview
+
+        // "Go" button
+        this.buttonGo.button.on('pointerdown', this.startFly, this)   // start flying (game scene)
 
     }
 
@@ -86,13 +215,14 @@ export default class EstimateScene extends Phaser.Scene {
         // add the numbers to estimate the time
         const startTime = [1, 0 , 0];
 
-        const distance = 0.2;               // horizontal distance between the numbers (relative to game width)
-        const positionY = 0.5;              // vertical position (relative to game height)
+        const distance = 0.19;               // horizontal distance between the numbers (relative to game width)
+        const startX = 0.39;                 // start position of the first number (relative to game width)
+        const positionY = this.bubble2.y + gameOptions.gameHeight * 0.125;              // vertical position (absolute position)
 
         for (let i = 0; i < startTime.length; i++) {
 
             this.numbers.push(this.add.text(
-                gameOptions.gameWidth * ((1 - (startTime.length - 1) * distance) / 2  + i * distance), gameOptions.gameHeight * positionY,
+                gameOptions.gameWidth * (startX + i * distance), positionY,
                 startTime[i].toString(), gameOptions.textStyles[1]).setOrigin(0.5, 0.5));
 
         }
@@ -103,7 +233,8 @@ export default class EstimateScene extends Phaser.Scene {
             's', gameOptions.textStyles[1]).setOrigin(0.5, 0.5);
 
         // add the expected points number
-        this.expectedPoints = this.add.text(gameOptions.gameWidth * 0.5,gameOptions.gameHeight * 0.7,
+        this.expectedPoints = this.add.text(gameOptions.gameWidth * 0.5,
+            this.bubble3.y + gameOptions.gameHeight * 0.08,
             ' ', gameOptions.textStyles[1]).setOrigin(0.5, 0.5);                    // create text object
         this.updatePoints();        // update the expected points
 
@@ -112,7 +243,7 @@ export default class EstimateScene extends Phaser.Scene {
     // add buttons to change the time
     addTimeButtons() {
 
-        const distance = 0.05           // vertical distance from the number (relative to game height)
+        const distance = 0.008;           // vertical distance from the number (relative to game height)
 
         const positionYUp = this.numbers[0].y - this.numbers[0].height / 2 - distance * gameOptions.gameHeight;     // y position of the up button
         const positionYDown = this.numbers[0].y + this.numbers[0].height / 2 + distance * gameOptions.gameHeight;   // y position of the up button
@@ -120,9 +251,9 @@ export default class EstimateScene extends Phaser.Scene {
         for (let i = 0; i < this.numbers.length; i++) {
 
             // up button
-            const buttonUp = this.add.sprite(this.numbers[i].x, positionYUp, 'timechanger');
+            const buttonUp = this.add.sprite(this.numbers[i].x, positionYUp, 'timeChanger', 0);
 
-            buttonUp.setOrigin(0.5, 0);
+            buttonUp.setOrigin(0.5, 1);
             buttonUp.setInteractive();
 
             buttonUp.on('pointerdown', function(this: EstimateScene) {
@@ -130,10 +261,9 @@ export default class EstimateScene extends Phaser.Scene {
             }, this);
 
             // down button
-            const buttonDown = this.add.sprite(this.numbers[i].x, positionYDown, 'timechanger');
+            const buttonDown = this.add.sprite(this.numbers[i].x, positionYDown, 'timeChanger', 1);
 
             buttonDown.setOrigin(0.5, 0);
-            buttonDown.setAngle(180);
             buttonDown.setInteractive();
 
             buttonDown.on('pointerdown', function(this: EstimateScene) {
@@ -236,7 +366,7 @@ export default class EstimateScene extends Phaser.Scene {
     // Update the expected points
     updatePoints() {
 
-        this.expectedPoints.setText(this.calculatePoints(this.getEstimatedTime()).toString());
+        this.expectedPoints.setText(this.calculatePoints(this.getEstimatedTime()).toString() + ' CZD!');
 
     }
 

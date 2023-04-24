@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import gameOptions from '../helper/gameOptions';
 import {GameData, LevelData} from "../helper/interfaces";
+import Button from "../sprites/Button";
 
 // "Overview" scene: Scene where you see the overview of the level
 export default class OverviewScene extends Phaser.Scene {
@@ -28,14 +29,14 @@ export default class OverviewScene extends Phaser.Scene {
     // Shows the all objects of this scene
     create(): void {
 
-        // create world (background and camera
+        // create world (background and cameras)
         this.createWorld();
 
         // draw level
         this.drawLevel();
 
-        // Add title
-        //this.add.text(gameOptions.gameWidth / 2, gameOptions.gameHeight * 0.2, 'Overview', gameOptions.textStyles[0]).setOrigin(0.5, 0.5);
+        // add frame of the map
+        this.addFrame();
 
         // Add buttons
         this.addButtons();
@@ -58,7 +59,7 @@ export default class OverviewScene extends Phaser.Scene {
         this.cameras.main.setZoom(gameOptions.gameWidth / gameOptions.worldWidth);
 
         // add background
-        this.add.image(0, 0, 'backgroundMap').setOrigin(0);
+        this.add.image(0, 0, 'backgroundMap').setOrigin(0).setScale(3);
 
 
     }
@@ -103,15 +104,26 @@ export default class OverviewScene extends Phaser.Scene {
         }
     }
 
+    // add frame
+    addFrame() {
+
+        // add background
+        this.add.image(0, 0, 'frameMap').setOrigin(0).setScale(3);
+
+    }
+
     // Add buttons including controls
     addButtons() {
 
         // button to back to the estimation scene
-        const buttonBack = this.add.text(gameOptions.gameWidth / 2, gameOptions.gameHeight * 0.8,
-            'Go back', gameOptions.textStyles[1]);
-        buttonBack.setOrigin(0.5, 0.5);                                                                     // set position
-        buttonBack.setInteractive();
-        buttonBack.on('pointerdown', function(this: OverviewScene) { this.backToEstimate() }, this);      // add touch control
+        const buttonBack = this.add.existing(new Button(this,
+                gameOptions.worldWidth * 0.67,
+                gameOptions.worldHeight * 0.95,
+                'Back'
+            ));
+
+        buttonBack.setScale(3);
+        buttonBack.button.on('pointerdown', function(this: OverviewScene) { this.backToEstimate() }, this);      // add touch control
 
     }
 

@@ -172,7 +172,8 @@ export default class GameScene extends Phaser.Scene {
         // set camera
         this.cameras.main.setBounds(0, 0, gameOptions.worldWidth, gameOptions.worldHeight);
         this.cameras.main.setScroll(gameOptions.worldWidth / 2, gameOptions.worldHeight - gameOptions.gameHeight);
-        this.cameras.main.setSize(gameOptions.gameWidth, gameOptions.gameHeight);
+        this.cameras.main.setSize(gameOptions.gameWidth, gameOptions.gameHeight - gameOptions.uiHeight);
+        this.cameras.main.setPosition(0, gameOptions.uiHeight);
 
         // add background
         this.add.image(0, 0, 'background').setOrigin(0);
@@ -210,9 +211,7 @@ export default class GameScene extends Phaser.Scene {
 
             this.objectives.push(this.add.existing(new Objective(this,
                 gameOptions.worldWidth * levelData.objectives[i].x,
-                gameOptions.worldHeight * levelData.objectives[i].y,
-                levelData.objectives[i].color)));
-
+                gameOptions.worldHeight * levelData.objectives[i].y)));
         }
 
         // create indicators (one for each objective and in exactly the same order!)
