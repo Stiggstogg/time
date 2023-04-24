@@ -8,7 +8,7 @@ export default class Bubble extends Phaser.GameObjects.Container {
     private readonly textX: number;                         // x position where the text starts (top left, relative to game width)
     private readonly arrowX: number                         // x position of the arrow from the edge (depending if left or right, relative to game width)
     private numElements!: number;                           // number of bubble elements needed for the text
-    private text!: Phaser.GameObjects.Text;                 // text object
+    public text!: Phaser.GameObjects.Text;                 // text object
     private top!: Phaser.GameObjects.Image;                 // top element of the bubble
     private readonly middle: Phaser.GameObjects.Image[];            // middle elements of the bubble
     private bottom!: Phaser.GameObjects.Image;              // bottom element of the bubble

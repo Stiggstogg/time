@@ -130,7 +130,11 @@ export default class LoadingScene extends Phaser.Scene {
     // Add the animations and change to "Home" scene, directly after loading
     create() {
         this.scene.start('Home');
-        //this.scene.start('Estimate', {level: 1, point: 0})
+        /*this.scene.start('Points', {level: 1, points: 0, time: 0,
+            expectedPoints: 3000,
+            collisions: 2,
+            successful: true
+        });*/
     }
 
 }
