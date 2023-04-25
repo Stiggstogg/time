@@ -23,6 +23,14 @@ import buttonImg from '../assets/images/button.png';
 import particleImg from '../assets/images/particle.png';
 import uiFlyImg from '../assets/images/uiFly.png';
 
+// audio
+import clickAudio from '../assets/audio/click.mp3';
+import mapAudio from '../assets/audio/map.mp3';
+import musicAudio from '../assets/audio/music.mp3';
+import birdAudio from '../assets/audio/bird.mp3';
+import engineAudio from '../assets/audio/engine.mp3';
+import crashAudio from '../assets/audio/crash.mp3';
+
 // Levels
 import level0Json from '../assets/json/level0.json';
 import level1Json from '../assets/json/level1.json';
@@ -115,7 +123,12 @@ export default class LoadingScene extends Phaser.Scene {
         this.load.spritesheet('timeChanger', timeChangerImg, {frameWidth: 55, frameHeight: 59});
 
         // load audio
-        //this.load.audio('miss', 'assets/audio/Pew.mp3');
+        this.load.audio('click', clickAudio);
+        this.load.audio('map', mapAudio);
+        this.load.audio('music', musicAudio);
+        this.load.audio('bird', birdAudio);
+        this.load.audio('engine', engineAudio);
+        this.load.audio('crash', crashAudio);
 
         // load json
         this.load.json('level0', level0Json);

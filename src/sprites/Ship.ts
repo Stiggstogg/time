@@ -13,9 +13,11 @@ export default class Ship extends Phaser.Physics.Matter.Sprite {
     private sensor: ShipSensor;         // sensor which detects where the last save position of the ship was
     public xgeo: number;               // x coordinate of the geometrical center of the ship (middle point of the bounding box around the triangle)
     public ygeo: number;               // y coordinate of the geometrical center of the ship (middle point of the bounding box around the triangle)
+    private engineLeft: Phaser.GameObjects.Particles.ParticleEmitter;   // particles for the left engine
+    private engineRight: Phaser.GameObjects.Particles.ParticleEmitter;  // particles for the right engine
 
     // Constructor
-    constructor(scene: Phaser.Scene, x: number, y: number) {
+    constructor(scene: Phaser.Scene, x: number, y: number, engineLeft: Phaser.GameObjects.Particles.ParticleEmitter, engineRight: Phaser.GameObjects.Particles.ParticleEmitter) {
 
         super(scene.matter.world, x, y, 'ship');
 
@@ -29,31 +31,33 @@ export default class Ship extends Phaser.Physics.Matter.Sprite {
             isSensor: true
         });
 
+        // initialize the engines
+        this.engineLeft = engineLeft;
+        this.engineRight = engineRight;
+
         // create the sensor and add it to the scene
         const sensorAngle = 2 * Math.atan(this.width / (2 * this.height) );
         const sensorRadius = this.width / (2 * Math.sin(sensorAngle)) * gameOptions.shipSaveZoneFactor;
         this.sensor = scene.add.existing(new ShipSensor(scene, x, y, sensorRadius));
-
-        // set the movement direction
-        this.turnFactor = -1;           // set it first to counterclockwise
-        this.changeDirection();         // then change the direction
 
         // set collision category and with whom it collides
         this.setCollisionCategory(1);   // category needs to be a power of 2, e.g. 1, 2, 4, 8,...!
         this.setCollidesWith(2);      // collides only with blocks
 
         // initialize variables
+        this.turnFactor = 1;                    // set it first to turn in clockwise direction
         this.isTumbling = false;                // ship is not tumbling at the beginning
         this.isIdle = true;                     // ship is idle at the beginning
         this.tumblingStartTime = Date.now();   // set the tumbling start time to now
         this.xgeo = this.x;                     // set the geometrical middle point coordinates
         this.ygeo = this.y - this.height / 6;   // set the geometrical middle point coordinates
 
-        this.setBounce(gameOptions.shipBounce);
-
     }
 
+    // change the turning direction of the ship
     changeDirection(): void {
+
+        const engineSound = this.scene.sound.get('engine');
 
         // do not do anything if it is tumbling!
         if (!this.isTumbling) {
@@ -69,6 +73,24 @@ export default class Ship extends Phaser.Physics.Matter.Sprite {
 
             }
 
+            // turn on or switch the engine
+            if (this.turnFactor == -1) {        // counterclockwise
+
+                // particles
+                this.engineLeft.stop();
+                this.engineRight.start();
+
+            }
+            else {                              // clockwise
+
+                // particles
+                this.engineLeft.start();
+                this.engineRight.stop();
+            }
+
+            // turn on the engine sound
+            engineSound.play();
+
         }
 
     }
@@ -83,6 +105,9 @@ export default class Ship extends Phaser.Physics.Matter.Sprite {
         this.sensor.update();                   // update the sensor
 
         this.sensor.moveTo(this.x, this.y);     // move the sensor together with the ship
+
+        // update engine positions (particle emitters)
+        this.updateEnginePositions();
 
         // check for tumbling, idle or flying
         if (this.isTumbling) {                  // tumbling
@@ -115,6 +140,26 @@ export default class Ship extends Phaser.Physics.Matter.Sprite {
             this.setVelocityY(-gameOptions.shipSpeed * Math.sin(angleRad));
         }
 
+    }
+
+    // update the engine positions
+    updateEnginePositions(): void {
+
+        const angleRad = Phaser.Math.DegToRad(this.angle);       // angle of the ship in radians
+
+        // set angles
+        this.engineLeft.setAngle(this.angle);                       // set the angle of the engine
+        this.engineRight.setAngle(this.angle);
+
+        this.engineLeft.setPosition(
+            this.xgeo - this.height / 2 * Math.sin(angleRad) - this.width / 4 * Math.cos(angleRad),
+            this.ygeo + this.height / 2 * Math.cos(angleRad) - this.width / 4 * Math.sin(angleRad)
+        );
+
+        this.engineRight.setPosition(
+            this.xgeo - this.height / 2 * Math.sin(angleRad) + this.width / 4 * Math.cos(angleRad),
+            this.ygeo + this.height / 2 * Math.cos(angleRad) + this.width / 4 * Math.sin(angleRad)
+        );
 
     }
 
@@ -124,6 +169,13 @@ export default class Ship extends Phaser.Physics.Matter.Sprite {
         if (!this.isTumbling) {
 
             if (data.bodyB.label == 'block') {                              // collision with a block
+
+                this.engineLeft.stop();                                     // turn off both engines
+                this.engineRight.stop();
+
+                this.scene.sound.get('engine').stop();                      // stop the engine sound
+
+                this.scene.sound.get('crash').play();                       // play crash sound
 
                 this.scene.cameras.main.shake(500, 0.01);    // shake camera
 

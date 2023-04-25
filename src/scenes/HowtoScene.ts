@@ -37,6 +37,8 @@ export default class HowtoScene extends Phaser.Scene {
     // Shows the all objects of this scene
     create(): void {
 
+        //this.sound.add('click').play();
+
         // Create all texts
         this.createTexts();
 
@@ -161,7 +163,7 @@ export default class HowtoScene extends Phaser.Scene {
         this.textsOverlord.push(
             'Flying:\n' +
             'Our spaceships fly always in circles. ' +
-            'You only need to press one button (tap / click the screen or use SPACE) to change direction. ' +
+            'You only need to press one button (tap or click the screen) to change direction. ' +
             'The arrows show you where the remaining birds are.\n\n' +
             'Avoid space debris! I will charge you ' + gameOptions.collisionPenalty.toString() + ' CZD for every crash!\n\n' +
             'If you make it within time you will get the CZDs I offered.\n' +

@@ -25,6 +25,9 @@ export default class Button extends Phaser.GameObjects.Container {
         // ensure that the text is rendered last (so that it is on top)
         this.bringToTop(this.text);
 
+        // add sound when clicked
+        this.addSound();
+
     }
 
     // add the text part
@@ -53,6 +56,17 @@ export default class Button extends Phaser.GameObjects.Container {
             ).setOrigin(0.5);
 
         this.add(this.text);
+
+    }
+
+    // add sound
+    addSound() {
+
+        const click = this.scene.sound.add('click');
+
+        this.button.on('pointerdown', function() {
+            click.play();
+        })
 
     }
 

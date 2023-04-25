@@ -29,6 +29,12 @@ export default class OverviewScene extends Phaser.Scene {
     // Shows the all objects of this scene
     create(): void {
 
+        const mapSound = this.sound.add('map');
+
+        this.events.on(Phaser.Scenes.Events.RESUME, function(this: OverviewScene) {
+            mapSound.play();
+        }, this)
+
         // create world (background and cameras)
         this.createWorld();
 

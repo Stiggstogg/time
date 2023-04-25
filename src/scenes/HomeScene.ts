@@ -47,6 +47,9 @@ export default class HomeScene extends Phaser.Scene {
         // Add the button actions
         this.addButtonActions();
 
+        // setup music
+        this.setupMusic();
+
     }
 
     // Create all menu elements (buttons, bubbles, title,...)
@@ -122,6 +125,30 @@ export default class HomeScene extends Phaser.Scene {
 
         // "how?" button
         this.buttonHow.button.on('pointerdown', this.startHowTo, this)   // go to the tutorial when this button is pressed
+
+    }
+
+    // setup the music
+    setupMusic() {
+
+        // get the sound object
+        let sound = this.sound.get('music');
+
+        // check if music is already added to the sound manager. If not add it
+        if (sound == null) {
+
+            sound = this.sound.add('music', {
+                loop: true
+            });
+
+        }
+
+        // start the music if it is not playing
+        if (!sound.isPlaying) {
+
+            sound.play();
+
+        }
 
     }
 

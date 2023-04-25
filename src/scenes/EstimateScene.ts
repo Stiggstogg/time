@@ -190,12 +190,6 @@ export default class EstimateScene extends Phaser.Scene {
             'LET\'S FLY!'
         ));
 
-        // --------------------
-        // Time frames
-        // --------------------
-
-
-
     }
 
     // add all the actions to the buttons
@@ -248,6 +242,9 @@ export default class EstimateScene extends Phaser.Scene {
         const positionYUp = this.numbers[0].y - this.numbers[0].height / 2 - distance * gameOptions.gameHeight;     // y position of the up button
         const positionYDown = this.numbers[0].y + this.numbers[0].height / 2 + distance * gameOptions.gameHeight;   // y position of the up button
 
+        // sound
+        const click = this.sound.add('click');
+
         for (let i = 0; i < this.numbers.length; i++) {
 
             // up button
@@ -258,6 +255,7 @@ export default class EstimateScene extends Phaser.Scene {
 
             buttonUp.on('pointerdown', function(this: EstimateScene) {
                 this.changeNumber(i, true);
+                click.play();
             }, this);
 
             // down button
@@ -268,6 +266,7 @@ export default class EstimateScene extends Phaser.Scene {
 
             buttonDown.on('pointerdown', function(this: EstimateScene) {
                 this.changeNumber(i, false);
+                click.play();
             }, this);
 
         }

@@ -86,7 +86,7 @@ export default class PointsScene extends Phaser.Scene {
             this.state = 'good';                                                // set the state to 'good'
 
             this.overlordString = 'Good!\n' +
-                'You completed mission ' + gameOptions.numLevels.toString() + '.\n\n' +
+                'You completed mission ' + this.gameData.level.toString() + '.\n\n' +
                 'Let\'s look at your balance:' +
                 pointsSpace;
 
