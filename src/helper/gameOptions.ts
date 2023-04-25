@@ -124,6 +124,22 @@ class GameOptions {
             fontStyle: 'bold'
         });
 
+        // Text style 6: Text on the map
+        this.textStyles.push({
+            fontFamily: 'Orbitron',
+            fontSize: '96px',
+            color: '#000000',
+            fontStyle: 'bold'
+        });
+
+        // Text style 7: Explanation text on the map
+        this.textStyles.push({
+            fontFamily: 'Orbitron',
+            fontSize: '72px',
+            color: '#5e432d',
+            fontStyle: 'bold'
+        });
+
         // -----------------------------
         // Parameters for point system
         // -----------------------------

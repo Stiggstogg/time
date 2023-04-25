@@ -129,7 +129,12 @@ export default class LoadingScene extends Phaser.Scene {
 
     // Add the animations and change to "Home" scene, directly after loading
     create() {
+
         this.scene.start('Home');
+
+        // Debug stuff
+
+        //this.scene.start('HowTo');
         /*this.scene.start('Points', {level: 1, points: 0, time: 0,
             expectedPoints: 3000,
             collisions: 2,

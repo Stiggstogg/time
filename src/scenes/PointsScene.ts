@@ -61,7 +61,7 @@ export default class PointsScene extends Phaser.Scene {
         const lastLevel = this.gameData.level == gameOptions.numLevels;
 
         const pointsSpace = '\n\n\n\n\n\n\n\n\n\n';                 // string for the space which needs to be left for the points
-        const buttonSpace = '\n\n\n\n'
+        const buttonSpace = '\n\n\n\n';
 
         if (lastLevel && this.gameData.successful) {                        // Level was successful and it was the last one
 
@@ -140,7 +140,7 @@ export default class PointsScene extends Phaser.Scene {
 
         // distances for bubbles and overlord / creep
         const firstY = 0.08;        // y position of the first bubble (relative to game height)
-        const distanceY1 = [        // distances between the different elements (relative to game)
+        const distanceY1 = [        // distances between the different elements (relative to game height)
             0.085,                  // overlord and bottom of the text of the first bubble
             0.06,                   // overlord and second bubble
             0.08,                   // bottom of the text of the second bubble and creep
@@ -261,7 +261,7 @@ export default class PointsScene extends Phaser.Scene {
         // Collision points
         this.add.text(this.bubbleOverlord.text.x,
             startY + gameOptions.gameHeight * spaceY * 2,
-            'Collisions:',
+            'Crashes:',
             gameOptions.textStyles[1]).setOrigin(0, 0.5);
 
         let collisionPointsText = this.collisionPoints.toString()  + ' CZD';

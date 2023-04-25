@@ -38,6 +38,9 @@ export default class OverviewScene extends Phaser.Scene {
         // add frame of the map
         this.addFrame();
 
+        // add explanation text
+        this.addExplanation();
+
         // Add buttons
         this.addButtons();
 
@@ -71,12 +74,13 @@ export default class OverviewScene extends Phaser.Scene {
         const levelString: string = 'level' + this.level.toString();   // create the string with the level name (key to the loaded json)
         const levelData: LevelData = this.cache.json.get(levelString);  // get the data from the json
 
-        // place the ship
-        this.add.image(
+        // place the ship (as text)
+        this.add.text(
             gameOptions.worldWidth * levelData.ship.x,
             gameOptions.worldHeight * levelData.ship.y,
-            'ship'
-        );
+            'O',
+            gameOptions.textStyles[6]
+        ).setOrigin(0.5);
 
         // place all blocks
         for (let i = 0; i < levelData.blocks.length; i++) {
@@ -92,14 +96,15 @@ export default class OverviewScene extends Phaser.Scene {
                 .setTint(0x000000);
         }
 
-        // place all objectives
+        // place all objectives (as text)
         for (let i = 0; i < levelData.objectives.length; i++) {
 
-            this.add.image(
+            this.add.text(
                 gameOptions.worldWidth * levelData.objectives[i].x,
                 gameOptions.worldHeight * levelData.objectives[i].y,
-                'objective',
-            );
+                'X',
+                gameOptions.textStyles[6]
+            ).setOrigin(0.5);
 
         }
     }
@@ -109,6 +114,21 @@ export default class OverviewScene extends Phaser.Scene {
 
         // add background
         this.add.image(0, 0, 'frameMap').setOrigin(0).setScale(3);
+
+    }
+
+    // add explanation text
+    addExplanation() {
+
+        const x = 0.06;             // x position relative to world width
+        const y = 0.04;             // y position relative to world width
+
+        this.add.text(
+            gameOptions.worldWidth * x,
+            gameOptions.worldWidth * y,
+            'O: Start\nX: Bird',
+            gameOptions.textStyles[7]
+        ).setOrigin(0);
 
     }
 

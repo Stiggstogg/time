@@ -180,7 +180,7 @@ export default class EstimateScene extends Phaser.Scene {
         this.buttonMap = this.add.existing(new Button(this,
             gameOptions.gameWidth * 0.5,
             bubble1.y + gameOptions.gameHeight * distanceY2[0],
-            '... map!'
+            '...map!'
         ));
 
         // add map button
