@@ -157,7 +157,7 @@ export default class HowtoScene extends Phaser.Scene {
             '2. Flying\n\n' +
             'Time estimation:\n' +
             'In this phase you can study the map, where you will see your starting point and the location of the birds.\n' +
-            'Then you will tell me how much time you will need to collect all birds and and I will offer you some CREEPZ DOLLARZ (CZD).\n\n' +
+            'Then you will tell me how much time you will need to collect all birds and I will offer you some CREEPZ DOLLARZ (CZD).\n\n' +
             'The faster you think you are the more I will offer!'
         );
 

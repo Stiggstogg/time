@@ -74,7 +74,7 @@ export default class GameUIScene extends Phaser.Scene {
         }
 
         // check if time is < 10 s and the warning was not sent already. If not send an event
-        if (this.remainingTime < 10 && !this.warningSent) {
+        if (this.remainingTime < 10 && !this.warningSent && this.running) {
 
             this.warningSent = true;                                    // change the boolean so that the warning is only sent once
             eventsCenter.emit('warning', this.remainingTime);     // send the warning with the remaining time
