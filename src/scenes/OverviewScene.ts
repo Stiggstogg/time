@@ -29,10 +29,16 @@ export default class OverviewScene extends Phaser.Scene {
     // Shows the all objects of this scene
     create(): void {
 
-        const mapSound = this.sound.add('map');
+        // setup sounds
+        this.setupSounds();
 
+        // setup actions which should be done when the scene is resumed
         this.events.on(Phaser.Scenes.Events.RESUME, function(this: OverviewScene) {
-            mapSound.play();
+
+            this.scene.setVisible(true);                       // make scene visible
+            this.sound.get('map').play();                           // play map sound
+            this.cameras.main.fadeIn(gameOptions.fadeInOutTime);    // fade in
+
         }, this)
 
         // create world (background and cameras)
@@ -132,7 +138,7 @@ export default class OverviewScene extends Phaser.Scene {
         this.add.text(
             gameOptions.worldWidth * x,
             gameOptions.worldWidth * y,
-            'O: Start\nX: Bird',
+            'O: Start\nX: Bird(s)',
             gameOptions.textStyles[7]
         ).setOrigin(0);
 
@@ -153,12 +159,34 @@ export default class OverviewScene extends Phaser.Scene {
 
     }
 
+    // setup sounds
+    setupSounds() {
+
+        // get the sound object
+        let mapSound = this.sound.add('map');
+
+        // check if sound is already added to the sound manager. If not add it
+        if (mapSound == null) {
+
+            mapSound = this.sound.add('map');
+
+        }
+
+    };
+
     // Go back to the estimation scene
     backToEstimate() {
 
-        this.scene.pause();
-        this.scene.setVisible(false);
-        this.scene.resume('Estimate');
+        // do the action as soon as the camerafadeout is complete
+        this.cameras.main.once('camerafadeoutcomplete', function(this: OverviewScene) {
+
+            this.scene.pause();
+            this.scene.setVisible(false);
+            this.scene.resume('Estimate');
+
+        }, this);
+
+        this.cameras.main.fadeOut(gameOptions.fadeInOutTime);           // fade out the camera
 
     }
 

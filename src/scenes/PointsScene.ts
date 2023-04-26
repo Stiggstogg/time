@@ -19,6 +19,8 @@ export default class PointsScene extends Phaser.Scene {
     private buttonOne!: Button;
     private buttonTwo!: Button;
     private state!: string;
+    private missionString!: string;
+    private missionTextColor!: string;
 
     // Constructor
     constructor() {
@@ -37,6 +39,12 @@ export default class PointsScene extends Phaser.Scene {
 
     // Shows the all objects of this scene
     create(): void {
+
+        // stop engine sound in case it is still running (happens sometimes, seems to be a bug)
+        this.sound.get('engine').stop();
+
+        // fade in
+        this.fadeInColor();
 
         // calculate points
         this.calculatePoints();
@@ -60,6 +68,7 @@ export default class PointsScene extends Phaser.Scene {
 
         const lastLevel = this.gameData.level == gameOptions.numLevels;
 
+        const startSpace = '\n\n\n';                                // space at the top for the accomplished / failed message
         const pointsSpace = '\n\n\n\n\n\n\n\n\n\n';                 // string for the space which needs to be left for the points
         const buttonSpace = '\n\n\n\n';
 
@@ -67,15 +76,27 @@ export default class PointsScene extends Phaser.Scene {
 
             this.state = 'done';                                                // set the state to 'done'
 
-            this.overlordString = 'Congratulations!\n' +
-                'You completed all ' + gameOptions.numLevels.toString() + 'missions!\n\n' +
+            // mission string and color
+            this.missionString = 'ACCOMPLISHED!'
+            this.missionTextColor = Phaser.Display.Color.RGBToString(
+                gameOptions.fadeColorSuccess[0],
+                gameOptions.fadeColorSuccess[1],
+                gameOptions.fadeColorSuccess[2]);
+
+            // overlord string
+            this.overlordString = startSpace +
+                'Congratulations!\n' +
+                'You completed all ' + gameOptions.numLevels.toString() + ' missions!\n\n' +
                 'Let\'s look at your balance:' +
-                pointsSpace +
-                'Thank you for your service!';
+                pointsSpace + 'Thank you for your service!'
 
-            this.creepString = 'It has been an honour my lord!' + buttonSpace;
+            // creep string
+            this.creepString = 'It has been an honour, my lord!\n' +
+                'It fills me with pride every time I can serve you. I hope we will conquer some more worlds and save more birds!' + buttonSpace;
 
+            // button string
             this.buttonStrings = [
+                'BYE!',                             // this one will not be used
                 'BYE!'
             ];
 
@@ -85,16 +106,27 @@ export default class PointsScene extends Phaser.Scene {
 
             this.state = 'good';                                                // set the state to 'good'
 
-            this.overlordString = 'Good!\n' +
+            // mission string
+            this.missionString = 'Excellent!'
+            this.missionTextColor = Phaser.Display.Color.RGBToString(
+                gameOptions.fadeColorSuccess[0],
+                gameOptions.fadeColorSuccess[1],
+                gameOptions.fadeColorSuccess[2]);
+
+            // overlord string
+            this.overlordString = startSpace +
+                'Well done!\n' +
                 'You completed mission ' + this.gameData.level.toString() + '.\n\n' +
                 'Let\'s look at your balance:' +
                 pointsSpace;
 
+            // creep string
             this.creepString = 'Let\'s go to the...' + buttonSpace +
             'or...' + buttonSpace;
 
+            // button string
             this.buttonStrings = [
-                '...next level!',
+                '...next mission!',
                 '...give up!'
             ];
 
@@ -103,11 +135,21 @@ export default class PointsScene extends Phaser.Scene {
 
             this.state = 'failed';                                                // set the state to 'failed'
 
-            this.overlordString = 'I am disappointed!\n' +
+            // mission string
+            this.missionString = 'Failed!'
+            this.missionTextColor = Phaser.Display.Color.RGBToString(
+                gameOptions.fadeColorFail[0],
+                gameOptions.fadeColorFail[1],
+                gameOptions.fadeColorFail[2]);
+
+            // overlord string
+            this.overlordString = startSpace +
+                'I am disappointed!\n' +
                 'You failed mission ' + this.gameData.level.toString() + '.\n\n' +
                 'Let\'s look at your balance:' +
                 pointsSpace;
 
+            // creep string
             this.creepString = 'I am sorry! I will...' + buttonSpace +
                 'or...' + buttonSpace;
 
@@ -139,11 +181,14 @@ export default class PointsScene extends Phaser.Scene {
         // --------------------
 
         // distances for bubbles and overlord / creep
-        const firstY = 0.08;        // y position of the first bubble (relative to game height)
-        const distanceY1 = [        // distances between the different elements (relative to game height)
-            0.085,                  // overlord and bottom of the text of the first bubble
-            0.06,                   // overlord and second bubble
-            0.08,                   // bottom of the text of the second bubble and creep
+        const firstY = 0.08;                    // y position of the first bubble (relative to game height)
+        const overlordX = 0.83;                 // x position of the overlord (relative to game width)
+        const creepX = 0.17;                    // x position of the creep (relative to game width)
+        const distances = [                      // distances between the different elements (relative to game height)
+            0.03,                               // Overlord bubble bottom and overlord middle
+            -0.02,                              // Overlord bottom and creep bubble
+            0.04,                               // Creep bubble (bottom) and creep
+            0.095,                              // Creep bubble top and "Flying" button
         ];
 
         // first bubble for the overlord
@@ -155,24 +200,35 @@ export default class PointsScene extends Phaser.Scene {
 
         // add the overlord
         const overlord = this.add.image(
-            gameOptions.gameWidth * 0.83,
-            this.bubbleOverlord.y + this.bubbleOverlord.text.height + gameOptions.gameHeight * distanceY1[0],
+            overlordX * gameOptions.gameWidth,
+            this.bubbleOverlord.bottomY + gameOptions.gameHeight * distances[0],
             'overlord'
         );
 
         // add the creep bubble
         this.bubbleCreep = this.add.existing(new Bubble(this,
             0,
-            overlord.y + gameOptions.gameHeight * distanceY1[1],
+            overlord.y + overlord.height / 2 + gameOptions.gameHeight * distances[1],
             this.creepString,
             'bottomLeft'));
 
         // add the creep
         this.add.image(
-            gameOptions.gameWidth * 0.17,
-            this.bubbleCreep.y + this.bubbleCreep.text.height + gameOptions.gameHeight * distanceY1[2],
+            creepX  * gameOptions.gameWidth,
+            this.bubbleCreep.bottomY + gameOptions.gameHeight * distances[2],
             'creep'
         );
+
+        // --------------------
+        // Mission text
+        // --------------------
+
+        this.add.text(this.bubbleOverlord.text.x,
+            this.bubbleOverlord.y + this.bubbleOverlord.text.y,
+            this.missionString,
+            gameOptions.textStyles[4])
+            .setOrigin(0, 0)
+            .setColor(this.missionTextColor);
 
         // --------------------
         // Buttons
@@ -184,6 +240,10 @@ export default class PointsScene extends Phaser.Scene {
             0.10                       // first and second button
         ];
 
+
+
+        // create the buttons based on the state
+
         // first button
         this.buttonOne = this.add.existing(new Button(this,
             gameOptions.gameWidth * 0.5,
@@ -191,19 +251,46 @@ export default class PointsScene extends Phaser.Scene {
             this.buttonStrings[0]
         ));
 
-        // second button (if available)
-        if (this.buttonStrings.length > 1) {
+        // second button
+        this.buttonTwo = this.add.existing(new Button(this,
+            gameOptions.gameWidth * 0.5,
+            this.buttonOne.y + gameOptions.gameHeight * distanceY2[1],
+            this.buttonStrings[1]
+        ));
 
-            this.buttonTwo = this.add.existing(new Button(this,
-                gameOptions.gameWidth * 0.5,
-                this.buttonOne.y + gameOptions.gameHeight * distanceY2[1],
-                this.buttonStrings[1]
-            ));
-
-        }
 
     }
 
+    // fade in with the right color, based on success or not
+    fadeInColor() {
+
+        // initialize colors
+        let red = 0;
+        let green = 0;
+        let blue = 0;
+
+        if (this.gameData.successful) {          // successful
+
+            // set colors for fade out (here: red)
+            red = gameOptions.fadeColorSuccess[0];
+            green = gameOptions.fadeColorSuccess[1];
+            blue = gameOptions.fadeColorSuccess[2];
+
+        }
+        else {
+
+            // set color for fade out (here: green
+            red = gameOptions.fadeColorFail[0];
+            green = gameOptions.fadeColorFail[1];
+            blue = gameOptions.fadeColorFail[2];
+
+        }
+
+        this.cameras.main.fadeIn(gameOptions.fadeInOutTime, red, green, blue);
+
+    }
+
+    // calculate the points
     calculatePoints() {
 
         // calculate the points you get from completing the level or failing it!
@@ -226,7 +313,7 @@ export default class PointsScene extends Phaser.Scene {
     // add all texts
     addPointsTexts() {
 
-        const startY = this.bubbleOverlord.y + gameOptions.gameHeight * 0.185;         // absolute y position where the points start
+        const startY = this.bubbleOverlord.bottomY - gameOptions.gameHeight * 0.23;         // absolute y position where the points start
         const spaceY = 0.04;        // space between the different points (relative to game height)
         const posX = 0.95;           // x position where the points are added (right aligned)
 
@@ -302,12 +389,9 @@ export default class PointsScene extends Phaser.Scene {
 
         if (this.state == 'done') {                                             // Level was successful and it was the last one
 
-            this.buttonOne.button.on('pointerdown', function(this: PointsScene) {
+            this.buttonOne.destroy();                                           // destroy button one as it is not needed
 
-                this.gameData.points = this.newPoints;
-                this.scene.start('Home');                                   // go back to menu
-
-            }, this);
+            this.buttonTwo.button.on('pointerdown', this.startMenu, this);  // back to menu
 
         }
         else if (this.state == 'good') {                                        // successful but there are still some levels
@@ -318,16 +402,13 @@ export default class PointsScene extends Phaser.Scene {
                 this.gameData.level += 1;                                       // set the level to the next one
 
                 this.gameData.points = this.newPoints;
-                this.scene.start('Estimate', this.gameData);               // go back the estimation scene (next level)
+
+                this.startEstimate();
 
             }, this);
 
             // button two
-            this.buttonTwo.button.on('pointerdown', function(this: PointsScene) {
-
-                this.scene.start('Home');                                   // go back to menu
-
-            }, this);
+            this.buttonTwo.button.on('pointerdown', this.startMenu, this);  // back to menu
 
         }
         else {                                                                      // not successful (repeat level)
@@ -336,18 +417,43 @@ export default class PointsScene extends Phaser.Scene {
             this.buttonOne.button.on('pointerdown', function(this: PointsScene) {
 
                 this.gameData.points = this.newPoints;
-                this.scene.start('Estimate', this.gameData);               // go back the estimation scene (same level)
+
+                this.startEstimate();
 
             }, this);
 
             // button two
-            this.buttonTwo.button.on('pointerdown', function(this: PointsScene) {
-
-                this.scene.start('Home');                                   // go back to menu
-
-            }, this);
+            this.buttonTwo.button.on('pointerdown', this.startMenu, this);      // back to menu
 
         }
+    }
+
+    // start the menu scene
+    startMenu() {
+
+        // do the action as soon as the camerafadeout is complete
+        this.cameras.main.once('camerafadeoutcomplete', function(this: PointsScene) {
+
+            this.scene.start('Home');                                   // go back to menu
+
+        }, this);
+
+        this.cameras.main.fadeOut(gameOptions.fadeInOutTime);           // fade out the camera
+
+    }
+
+    // start the estimation scene
+    startEstimate() {
+
+        // do the action as soon as the camerafadeout is complete
+        this.cameras.main.once('camerafadeoutcomplete', function(this: PointsScene) {
+
+            this.scene.start('Estimate', this.gameData);         // go back the estimation scene (same level)
+
+        }, this);
+
+        this.cameras.main.fadeOut(gameOptions.fadeInOutTime);           // fade out the camera
+
     }
 
 }

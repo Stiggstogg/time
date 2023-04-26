@@ -15,6 +15,7 @@ export default class GameScene extends Phaser.Scene {
     private indicators!: Indicator[];
     private gameData!: GameData;
     private gameRunning!: boolean;
+    private instructionText!: Phaser.GameObjects.Text;
 
     // Constructor
     constructor() {
@@ -45,6 +46,9 @@ export default class GameScene extends Phaser.Scene {
         // start UI scene
         this.scene.launch('GameUI', this.gameData);
 
+        // fade in
+        this.cameras.main.fadeIn(gameOptions.fadeInOutTime);
+
         // create the world
         this.createWorld();
 
@@ -62,6 +66,9 @@ export default class GameScene extends Phaser.Scene {
 
         // Add controls
         this.addControls();
+
+        // Add instruction text
+        this.addInstructionText();
 
     }
 
@@ -94,6 +101,8 @@ export default class GameScene extends Phaser.Scene {
 
         if (!this.gameRunning) {
             this.gameRunning = true;
+
+            this.instructionText.setVisible(false);     // remove instruction text (if not already, only in first level visible)
 
             eventsCenter.emit('startgame');
 
@@ -129,6 +138,8 @@ export default class GameScene extends Phaser.Scene {
 
             if (this.objectives.length < 1) {
 
+                this.sound.get('warning').stop();                           // immediately stop the warning sound (might be running)
+
                 this.levelOver(true);                               // level is over with success
                 
             }
@@ -142,12 +153,22 @@ export default class GameScene extends Phaser.Scene {
 
         }, this);
 
+        // event when there are 10 s (or less remaining)
+        eventsCenter.once('warning', function(this: GameScene, remainingTime: number) {
+
+            this.startWarning(remainingTime);           // start the warning sound
+
+        }, this);
+
         // Cleanup the events when the scene is shut down
         this.events.once(Phaser.Scenes.Events.SHUTDOWN, function() {
             eventsCenter.off('objectiveCollide');
             eventsCenter.off('blockCollide');
             eventsCenter.off('timeUp');
+            eventsCenter.off('warning');
         });
+
+
 
     }
 
@@ -228,6 +249,24 @@ export default class GameScene extends Phaser.Scene {
 
     }
 
+    // add instruction text
+    addInstructionText() {
+
+        this.instructionText = this.add.text(
+            this.ship.x,
+            this.ship.y + gameOptions.gameHeight * 0.15,
+            'The spaceship flies in circles.\n' +
+            'Tab / click the screen or press SPACE to start and change the direction.',
+            gameOptions.textStyles[8]
+        ).setOrigin(0.5);
+
+        // only show this text in the first level
+        if (this.gameData.level != 1) {
+            this.instructionText.setVisible(false);
+        }
+
+    }
+
     // setup all sounds
     setupSounds() {
 
@@ -258,29 +297,67 @@ export default class GameScene extends Phaser.Scene {
 
         }
 
+        // engine sound
+        let warningSound = this.sound.get('warning');
+
+        if (warningSound == null) {        // add it to the sound manager if it isn't yet available
+
+            warningSound = this.sound.add('warning' );
+
+        }
+
     }
-    
+
+    // start the warning sound
+    startWarning(remainingTime: number) {
+
+        const position = 10 - remainingTime;
+
+        this.sound.get('warning').play('',{seek: position});
+
+    }
+
     // level is over (either by elapsing time or by collecting all objectives)
     levelOver(successful: boolean) {
 
+        this.scene.pause('GameUI');                         // pause game UI scene
         this.sound.get('engine').stop();                        // stop engine sound
+        this.ship.pauseShip();                                  // pause ship so that it does not collide further
 
-        this.gameData.successful = successful;                      // set the success
-        
+        this.gameData.successful = successful;                  // set the success
+
+        // initialize colors
+        let red = 0;
+        let green = 0;
+        let blue = 0;
+
         if (successful) {          // successful
 
-            console.log('you won');     // TODO: Add here other things
+            // set colors for fade out (here: red)
+            red = gameOptions.fadeColorSuccess[0];
+            green = gameOptions.fadeColorSuccess[1];
+            blue = gameOptions.fadeColorSuccess[2];
 
         }
         else {
 
-            console.log('you lost');    // TODO: Add here other things
+            // set color for fade out (here: green
+            red = gameOptions.fadeColorFail[0];
+            green = gameOptions.fadeColorFail[1];
+            blue = gameOptions.fadeColorFail[2];
 
         }
 
-        this.scene.stop('GameUI');
-        this.scene.start('Points', this.gameData);              // go to the points scene
-        
+        // do the action as soon as the camerafadeout is complete
+        this.cameras.main.once('camerafadeoutcomplete', function(this: GameScene) {
+
+            this.scene.stop('GameUI');
+            this.scene.start('Points', this.gameData);              // go to the points scene
+
+        }, this);
+
+        this.cameras.main.fadeOut(gameOptions.fadeInOutTime, red, green, blue);           // fade out the camera
+
     }
 
 }

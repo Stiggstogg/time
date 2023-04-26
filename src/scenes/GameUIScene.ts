@@ -12,7 +12,8 @@ export default class GameUIScene extends Phaser.Scene {
     private startTime!: number;                     // start time (in ms since Unix Epoch)
     private running!: boolean;                      // is the timer running
     private remainingTime!: number;                 // remaining time
-    private collisionsCounter!: number;              // counts the number of collisions
+    private collisionsCounter!: number;             // counts the number of collisions
+    private warningSent!: boolean;                  // check if the 10 s warning was sent already
 
     // Constructor
     constructor() {
@@ -31,11 +32,15 @@ export default class GameUIScene extends Phaser.Scene {
         this.remainingTime = this.gameData.time!;       // set remaining time
         this.running = false;                           // set that the timer is not running yet
         this.collisionsCounter = 0;                    // set the collisions counter to 0
+        this.warningSent = false;                       // warning was not sent already
 
     }
 
     // Shows the all objects of this scene
     create(): void {
+
+        // fade in
+        this.cameras.main.fadeIn(gameOptions.fadeInOutTime);
 
         // add UI on top
         this.add.image(0, 0, 'uiFly').setOrigin(0);
@@ -68,6 +73,14 @@ export default class GameUIScene extends Phaser.Scene {
 
         }
 
+        // check if time is < 10 s and the warning was not sent already. If not send an event
+        if (this.remainingTime < 10 && !this.warningSent) {
+
+            this.warningSent = true;                                    // change the boolean so that the warning is only sent once
+            eventsCenter.emit('warning', this.remainingTime);     // send the warning with the remaining time
+
+        }
+
     }
 
     // add all texts
@@ -78,13 +91,12 @@ export default class GameUIScene extends Phaser.Scene {
 
         // Add text for the time
         this.timeText = this.add.text(
-            gameOptions.gameWidth * 0.29,
+            gameOptions.gameWidth * 0.30,
             gameOptions.gameWidth * statsY,
-            ' ',
+            '',
             gameOptions.textStyles[5])
             .setOrigin(1, 0.5);
         this.setTimerText(this.remainingTime);
-        this.timeText.setDepth(0);
 
         // Add text for level
         const levelText = this.gameData.level.toString() + '/' + gameOptions.numLevels.toString();
@@ -115,7 +127,7 @@ export default class GameUIScene extends Phaser.Scene {
 
         const timeSuffix = ' s';
 
-        this.timeText.setText(Math.round(time).toString() + timeSuffix);
+        this.timeText.setText(Math.ceil(time).toString() + timeSuffix);
 
     }
 

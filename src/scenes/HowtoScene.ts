@@ -37,7 +37,8 @@ export default class HowtoScene extends Phaser.Scene {
     // Shows the all objects of this scene
     create(): void {
 
-        //this.sound.add('click').play();
+        // fade in
+        this.cameras.main.fadeIn(gameOptions.fadeInOutTime);
 
         // Create all texts
         this.createTexts();
@@ -163,7 +164,7 @@ export default class HowtoScene extends Phaser.Scene {
         this.textsOverlord.push(
             'Flying:\n' +
             'Our spaceships fly always in circles. ' +
-            'You only need to press one button (tap or click the screen) to change direction. ' +
+            'You only need to press one button (tap / click the screen or press SPACE) to change direction. ' +
             'The arrows show you where the remaining birds are.\n\n' +
             'Avoid space debris! I will charge you ' + gameOptions.collisionPenalty.toString() + ' CZD for every crash!\n\n' +
             'If you make it within time you will get the CZDs I offered.\n' +
@@ -197,28 +198,44 @@ export default class HowtoScene extends Phaser.Scene {
     // make elements of the first talk invisible and add second talk
     secondTalk() {
 
-        // make bubbles and buttons of first talk invisible
-        this.bubblesOverlord[0].setVisible(false);
-        this.bubblesCreep[0].setVisible(false);
-        this.buttons[0].setVisible(false);
+        // do the action as soon as the camerafadeout is complete
+        this.cameras.main.once('camerafadeoutcomplete', function(this: HowtoScene) {
 
-        // make bubbles of second talk visible
-        this.bubblesOverlord[1].setVisible(true);
-        this.bubblesCreep[1].setVisible(true);
-        this.buttons[1].setVisible(true);
+            // make bubbles and buttons of first talk invisible
+            this.bubblesOverlord[0].setVisible(false);
+            this.bubblesCreep[0].setVisible(false);
+            this.buttons[0].setVisible(false);
 
-        // adjust positions of the bubbles, overlord, creep and button
-        this.overlord.setY(this.bubblesOverlord[1].bottomY + gameOptions.gameHeight * this.distances[0]);
-        this.bubblesCreep[1].setY(this.overlord.y + this.overlord.height / 2 + gameOptions.gameHeight * this.distances[1]);
-        this.creep.setY(this.bubblesCreep[1].calculateBottomY() + gameOptions.gameHeight * this.distances[2]);
-        this.buttons[1].setY(this.bubblesCreep[1].y + gameOptions.gameHeight * this.distances[3]);
+            // make bubbles of second talk visible
+            this.bubblesOverlord[1].setVisible(true);
+            this.bubblesCreep[1].setVisible(true);
+            this.buttons[1].setVisible(true);
+
+            // adjust positions of the bubbles, overlord, creep and button
+            this.overlord.setY(this.bubblesOverlord[1].bottomY + gameOptions.gameHeight * this.distances[0]);
+            this.bubblesCreep[1].setY(this.overlord.y + this.overlord.height / 2 + gameOptions.gameHeight * this.distances[1]);
+            this.creep.setY(this.bubblesCreep[1].calculateBottomY() + gameOptions.gameHeight * this.distances[2]);
+            this.buttons[1].setY(this.bubblesCreep[1].y + gameOptions.gameHeight * this.distances[3]);
+
+            this.cameras.main.fadeIn(gameOptions.fadeInOutTime);           // fade out the camera
+
+        }, this);
+
+        this.cameras.main.fadeOut(gameOptions.fadeInOutTime);           // fade out the camera
 
     }
 
     // Go back to home
     backToHome() {
 
-        this.scene.start('Home');      // go back to the menu
+        // do the action as soon as the camerafadeout is complete
+        this.cameras.main.once('camerafadeoutcomplete', function(this: HowtoScene) {
+            this.scene.start('Home');      // go back to the menu
+        }, this);
+
+        this.cameras.main.fadeOut(gameOptions.fadeInOutTime);           // fade out the camera
+
+
 
     }
 

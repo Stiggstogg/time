@@ -48,6 +48,16 @@ export default class EstimateScene extends Phaser.Scene {
     // Shows the all objects of this scene
     create(): void {
 
+        // fade in
+        this.cameras.main.fadeIn(gameOptions.fadeInOutTime);
+
+        // setup actions which should be done when the scene is resumed (coming back from map)
+        this.events.on(Phaser.Scenes.Events.RESUME, function(this: EstimateScene) {
+
+            this.cameras.main.fadeIn(gameOptions.fadeInOutTime);    // fade in
+
+        }, this)
+
         // Setup overview scene
         this.setupOverview();
 
@@ -62,8 +72,6 @@ export default class EstimateScene extends Phaser.Scene {
 
         // Add buttons
         this.addButtonActions();
-
-
 
     }
 
@@ -207,7 +215,7 @@ export default class EstimateScene extends Phaser.Scene {
     addNumbers() {
 
         // add the numbers to estimate the time
-        const startTime = [1, 0 , 0];
+        const startTime = [0, 1, 0];
 
         const distance = 0.19;               // horizontal distance between the numbers (relative to game width)
         const startX = 0.39;                 // start position of the first number (relative to game width)
@@ -302,16 +310,39 @@ export default class EstimateScene extends Phaser.Scene {
     // Start game
     startFly() {
 
-        this.scene.stop('Overview');        // stop the overview scene (which is currently paused)
+        // do the action as soon as the camerafadeout is complete
+        this.cameras.main.once('camerafadeoutcomplete', function(this: EstimateScene) {
 
-        this.gameData.time = 0;                 // reset estimated time
+            this.scene.stop('Overview');        // stop the overview scene (which is currently paused)
 
-        this.gameData.time = this.getEstimatedTime();
+            this.gameData.time = 0;                 // reset estimated time
 
-        // calculate and update estimated time in gameData
-        this.gameData.expectedPoints = this.calculatePoints(this.getEstimatedTime());
+            this.gameData.time = this.getEstimatedTime();
 
-        this.scene.start('Game', this.gameData);        // start first estimation scene with 0 points
+            // calculate and update estimated time in gameData
+            this.gameData.expectedPoints = this.calculatePoints(this.getEstimatedTime());
+
+            this.scene.start('Game', this.gameData);        // start first estimation scene with 0 points
+
+        }, this);
+
+        this.cameras.main.fadeOut(gameOptions.fadeInOutTime);           // fade out the camera
+
+
+    }
+
+    // Show the overview while maintaining the estimation scene in the background
+    showOverview() {
+
+        // do the action as soon as the camerafadeout is complete
+        this.cameras.main.once('camerafadeoutcomplete', function(this: EstimateScene) {
+
+            this.scene.pause();
+            this.scene.resume('Overview');
+
+        }, this);
+
+        this.cameras.main.fadeOut(gameOptions.fadeInOutTime);           // fade out the camera
 
     }
 
@@ -327,15 +358,6 @@ export default class EstimateScene extends Phaser.Scene {
         }
 
         return estimatedTime;
-
-    }
-
-    // Show the overview while maintaining the estimation scene in the background
-    showOverview() {
-
-        this.scene.pause();
-        this.scene.resume('Overview');
-        this.scene.setVisible(true, 'Overview');
 
     }
 

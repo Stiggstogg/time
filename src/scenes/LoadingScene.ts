@@ -30,11 +30,15 @@ import musicAudio from '../assets/audio/music.mp3';
 import birdAudio from '../assets/audio/bird.mp3';
 import engineAudio from '../assets/audio/engine.mp3';
 import crashAudio from '../assets/audio/crash.mp3';
+import warningAudio from '../assets/audio/warning.mp3';
 
 // Levels
 import level0Json from '../assets/json/level0.json';
 import level1Json from '../assets/json/level1.json';
 import level2Json from '../assets/json/level2.json';
+import level3Json from '../assets/json/level3.json';
+import level4Json from '../assets/json/level4.json';
+import level5Json from '../assets/json/level5.json';
 
 
 // "Loading" scene: Loads all assets and shows a progress bar while loading
@@ -129,11 +133,15 @@ export default class LoadingScene extends Phaser.Scene {
         this.load.audio('bird', birdAudio);
         this.load.audio('engine', engineAudio);
         this.load.audio('crash', crashAudio);
+        this.load.audio('warning', warningAudio);
 
         // load json
         this.load.json('level0', level0Json);
         this.load.json('level1', level1Json);
-        this.load.json('level2', level2Json);       // TODO: this is not the final level!
+        this.load.json('level2', level2Json);
+        this.load.json('level3', level3Json);
+        this.load.json('level4', level4Json);
+        this.load.json('level5', level5Json);
 
         // load fonts
         this.load.addFile(new WebFontFile(this.load, 'Orbitron'));
@@ -147,6 +155,7 @@ export default class LoadingScene extends Phaser.Scene {
 
         // Debug stuff
 
+        //this.scene.start('Points', {level: 2, points: 300, time: 100, expectedPoints: 2000, collisions: 2, successful: false});
         //this.scene.start('HowTo');
         /*this.scene.start('Points', {level: 1, points: 0, time: 0,
             expectedPoints: 3000,

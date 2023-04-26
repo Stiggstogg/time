@@ -15,6 +15,7 @@ export default class Ship extends Phaser.Physics.Matter.Sprite {
     public ygeo: number;               // y coordinate of the geometrical center of the ship (middle point of the bounding box around the triangle)
     private engineLeft: Phaser.GameObjects.Particles.ParticleEmitter;   // particles for the left engine
     private engineRight: Phaser.GameObjects.Particles.ParticleEmitter;  // particles for the right engine
+    public paused: boolean;              // boolean which says if the ship is paused. If it is paused it will not move anymore and also not update. This is needed to stop the ship immediately when the last objective was collected
 
     // Constructor
     constructor(scene: Phaser.Scene, x: number, y: number, engineLeft: Phaser.GameObjects.Particles.ParticleEmitter, engineRight: Phaser.GameObjects.Particles.ParticleEmitter) {
@@ -51,6 +52,7 @@ export default class Ship extends Phaser.Physics.Matter.Sprite {
         this.tumblingStartTime = Date.now();   // set the tumbling start time to now
         this.xgeo = this.x;                     // set the geometrical middle point coordinates
         this.ygeo = this.y - this.height / 6;   // set the geometrical middle point coordinates
+        this.paused = false;                     // ship is not paused
 
     }
 
@@ -59,8 +61,8 @@ export default class Ship extends Phaser.Physics.Matter.Sprite {
 
         const engineSound = this.scene.sound.get('engine');
 
-        // do not do anything if it is tumbling!
-        if (!this.isTumbling) {
+        // do not do anything if it is tumbling or paused!
+        if (!this.isTumbling || !this.paused) {
 
             if (this.isIdle) {
 
@@ -97,47 +99,48 @@ export default class Ship extends Phaser.Physics.Matter.Sprite {
 
     update(): void {
 
-        // set the geometrical middle point coordinates (calculation is based on the fact that the center of mass is at height / 3)
-        this.xgeo = this.x + this.height * Math.sin(Phaser.Math.DegToRad(this.angle)) / 6;
-        this.ygeo = this.y - this.height * Math.cos(Phaser.Math.DegToRad(this.angle)) / 6;
+        if (!this.paused) {          // only update if the ship is not paused
 
-        // sensor update
-        this.sensor.update();                   // update the sensor
+            // set the geometrical middle point coordinates (calculation is based on the fact that the center of mass is at height / 3)
+            this.xgeo = this.x + this.height * Math.sin(Phaser.Math.DegToRad(this.angle)) / 6;
+            this.ygeo = this.y - this.height * Math.cos(Phaser.Math.DegToRad(this.angle)) / 6;
 
-        this.sensor.moveTo(this.x, this.y);     // move the sensor together with the ship
+            // sensor update
+            this.sensor.update();                   // update the sensor
 
-        // update engine positions (particle emitters)
-        this.updateEnginePositions();
+            this.sensor.moveTo(this.x, this.y);     // move the sensor together with the ship
 
-        // check for tumbling, idle or flying
-        if (this.isTumbling) {                  // tumbling
+            // update engine positions (particle emitters)
+            this.updateEnginePositions();
 
-            this.setAngularVelocity(this.turnFactor * gameOptions.shipTumblingRotationSpeed);
+            // check for tumbling, idle or flying
+            if (this.isTumbling) {                  // tumbling
 
-            if (Date.now() - this.tumblingStartTime >= gameOptions.shipTumblingTime) {
-                this.isTumbling = false;
-                this.isIdle = true;
+                this.setAngularVelocity(this.turnFactor * gameOptions.shipTumblingRotationSpeed);
+
+                if (Date.now() - this.tumblingStartTime >= gameOptions.shipTumblingTime) {
+                    this.isTumbling = false;
+                    this.isIdle = true;
+                }
+
+            } else if (this.isIdle) {                 // idle (rotating, e.g. at the start and after a crash)
+
+                this.setAngularVelocity(this.turnFactor * gameOptions.shipRotationSpeed);
+
+            } else {                                  // when the ship is moving
+
+                this.setAngularVelocity(this.turnFactor * gameOptions.shipRotationSpeed);
+
+                // Calculating the angle in which the ship is facing in radians.
+                // Phaser uses a right hand clockwise rotation system, where 0 is right, 90 is down.
+                // 90 degrees need to be added to the angle as the ship was painted facing up, but the angle 0 is phasing to the right.
+                // As the vector component calculation is based on counter-clockwise angles the angle needs to be set to negative for the calculation.
+                const angleRad = (-this.angle + 90) * Math.PI / 180;
+
+                // setting the velocity components based on the angle it is facing to move it in a cricle
+                this.setVelocityX(gameOptions.shipSpeed * Math.cos(angleRad));
+                this.setVelocityY(-gameOptions.shipSpeed * Math.sin(angleRad));
             }
-
-        }
-        else if (this.isIdle) {                 // idle (rotating, e.g. at the start and after a crash)
-
-            this.setAngularVelocity(this.turnFactor * gameOptions.shipRotationSpeed);
-
-        }
-        else {                                  // when the ship is moving
-
-            this.setAngularVelocity(this.turnFactor * gameOptions.shipRotationSpeed);
-
-            // Calculating the angle in which the ship is facing in radians.
-            // Phaser uses a right hand clockwise rotation system, where 0 is right, 90 is down.
-            // 90 degrees need to be added to the angle as the ship was painted facing up, but the angle 0 is phasing to the right.
-            // As the vector component calculation is based on counter-clockwise angles the angle needs to be set to negative for the calculation.
-            const angleRad = (-this.angle + 90) * Math.PI / 180;
-
-            // setting the velocity components based on the angle it is facing to move it in a cricle
-            this.setVelocityX(gameOptions.shipSpeed * Math.cos(angleRad));
-            this.setVelocityY(-gameOptions.shipSpeed * Math.sin(angleRad));
         }
 
     }
@@ -205,6 +208,18 @@ export default class Ship extends Phaser.Physics.Matter.Sprite {
             }
 
         }
+
+    }
+
+    // pauses the ship
+    pauseShip() {
+
+        this.paused = true;
+
+        // stop all movement
+        this.setAngularVelocity(0);
+        this.setVelocityX(0);
+        this.setVelocityY(0);
 
     }
 

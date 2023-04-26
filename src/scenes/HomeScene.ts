@@ -41,6 +41,9 @@ export default class HomeScene extends Phaser.Scene {
     // Shows the home screen and waits for the user to select a menu entry
     create(): void {
 
+        // fade in
+        this.cameras.main.fadeIn(gameOptions.fadeInOutTime);
+
         // Create all the elements for the menu
         this.createElements();
 
@@ -61,7 +64,7 @@ export default class HomeScene extends Phaser.Scene {
         // title
         this.add.text(
             gameOptions.gameWidth / 2,
-            gameOptions.gameHeight * 0.1,
+            gameOptions.gameHeight * 0.08,
             this.titleText,
             gameOptions.textStyles[0]).setOrigin(0.5);
 
@@ -155,14 +158,24 @@ export default class HomeScene extends Phaser.Scene {
     // Start game
     startGame() {
 
-        this.scene.start('Estimate', {level: 1, points: 0});        // start first estimation scene with 0 points
+        // do the action as soon as the camerafadeout is complete
+        this.cameras.main.once('camerafadeoutcomplete', function(this: HomeScene) {
+            this.scene.start('Estimate', {level: 1, points: 0});        // start first estimation scene with 0 points
+        }, this);
+
+        this.cameras.main.fadeOut(gameOptions.fadeInOutTime);           // fade out the camera
 
     }
 
     // Start How To Play
     startHowTo() {
 
-        this.scene.start('HowTo');      // start "How to Play" scene
+        // do the action as soon as the camerafadeout is complete
+        this.cameras.main.once('camerafadeoutcomplete', function(this: HomeScene) {
+            this.scene.start('HowTo');      // start "How to Play" scene
+        }, this);
+
+        this.cameras.main.fadeOut(gameOptions.fadeInOutTime);           // fade out the camera
 
     }
 

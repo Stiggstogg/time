@@ -23,6 +23,9 @@ class GameOptions {
     public readonly parTimePoints: number;
     public readonly zeroPointTimeFactor: number;
     public readonly collisionPenalty: number;
+    public readonly fadeInOutTime: number;
+    public readonly fadeColorSuccess: number[];
+    public readonly fadeColorFail: number[];
 
 
     constructor() {
@@ -67,7 +70,7 @@ class GameOptions {
         // ---------------------
         // Levels
         // ---------------------
-        this.numLevels = 2;                         // number of levels
+        this.numLevels = 5;                         // number of levels
 
 
         // ---------------------
@@ -80,7 +83,7 @@ class GameOptions {
         this.textStyles.push({
             fontFamily: 'Orbitron',
             fontSize: '100px',
-            color: '#FFFF00',
+            color: '#FFE500',
             fontStyle: 'bold'
         });
 
@@ -140,14 +143,34 @@ class GameOptions {
             fontStyle: 'bold'
         });
 
+        // Text style 8: Instruction text
+        this.textStyles.push({
+            fontFamily: 'Orbitron',
+            fontSize: '32px',
+            color: '#FFE500',
+            fontStyle: ''
+        });
+
+        this.textStyles[8].wordWrap = {
+            width: this.gameWidth * 0.8
+        };
+
         // -----------------------------
         // Parameters for point system
         // -----------------------------
 
         this.parTimePoints = 4723;          // the amount of points you will get when you exactly estimate the par time
         this.zeroPointTimeFactor = 2;       // if multiplied with the par time, this is the time where you will get exactly 0 points
-        this.collisionPenalty = 100;            // the amount of points you loose when you crash
+        this.collisionPenalty = 100;        // the amount of points you loose when you crash
 
+
+        // ------------------------------
+        // Effects
+        // ------------------------------
+
+        this.fadeInOutTime = 300;                   // duration of the fade in or out in ms
+        this.fadeColorSuccess = [49, 151, 35]      // color of the fade when successful (game to points scene, RGB as array)
+        this.fadeColorFail = [251, 64, 65]         // color of the fade when failed (game to points scene, RGB as array)
 
     }
 
