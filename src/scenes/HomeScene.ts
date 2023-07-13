@@ -28,7 +28,7 @@ export default class HomeScene extends Phaser.Scene {
 
         // texts
         this.textOverlord = 'I am the mighty OVERLORD!\n\n' +
-            'I invaded earth and built many G5 towers. ' +
+            'I invaded earth and built many 5G towers. ' +
             'Unfortunately, because of the electromagnetic radiation my SPY BIRDS got lost and flew into space.\n' +
             'The faster you find them the more CREEPZ DOLLARZ (CZD) you will get!\n\n' +
             'Who will take over this noble task?';
